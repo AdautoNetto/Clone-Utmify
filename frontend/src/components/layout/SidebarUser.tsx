@@ -61,16 +61,17 @@ export function SidebarUser() {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarFallback className="rounded-lg bg-white/20 text-sidebar-foreground text-xs font-semibold">
+                {/* Avatar amarelo com iniciais em Sora, como o .m-avatar do SaaS */}
+                <AvatarFallback className="rounded-full bg-[var(--vt-yellow)] text-[#0B3456] font-num text-xs font-bold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium text-[13px]">
+                <span className="truncate font-bold text-[13px] text-white">
                   {user?.name || "Admin"}
                 </span>
-                <span className="truncate text-[11px] text-sidebar-foreground/60">
-                  {user?.role === "owner" ? "Owner" : user?.role === "admin" ? "Administrador" : user?.role === "viewer" ? "Visualizador" : ""}
+                <span className="truncate text-[11px] text-sidebar-foreground">
+                  {user?.role === "owner" ? "Dono" : user?.role === "admin" ? "Administrador" : user?.role === "viewer" ? "Visualizador" : ""}
                 </span>
               </div>
               <RiExpandUpDownLine className="ml-auto size-4" />
@@ -91,15 +92,7 @@ export function SidebarUser() {
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user?.name || "Admin"}</span>
-                  <a
-                    href="https://ilumin.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="truncate text-xs text-muted-foreground hover:text-primary transition-colors"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    Powered by Ilumin
-                  </a>
+                  <span className="truncate text-xs text-muted-foreground">{user?.email}</span>
                 </div>
               </div>
             </DropdownMenuLabel>

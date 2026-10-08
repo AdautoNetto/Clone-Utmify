@@ -43,7 +43,7 @@ export function AiTrainingProfile() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] font-semibold text-sidebar-foreground leading-tight">
-                  LOG POSE AI
+                  Vale Tec IA
                 </p>
                 <p className="text-[10px] text-sidebar-foreground/50 leading-tight">
                   {config.emoji} {data.level}

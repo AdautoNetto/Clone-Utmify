@@ -29,14 +29,14 @@ export function MoreDropdown({
 
   return (
     <div
-      className={`absolute bottom-full right-0 mb-2 transition-all duration-200 origin-bottom-right ${
+      className={`absolute bottom-full right-2 mb-2 transition-all duration-200 origin-bottom-right ${
         isOpen
           ? "opacity-100 scale-100 translate-y-0"
           : "opacity-0 scale-95 translate-y-2 pointer-events-none"
       }`}
     >
       {/* Rola por dentro: com todas as páginas, a lista passa da altura de celulares pequenos */}
-      <div className="rounded-2xl bg-card/95 backdrop-blur-xl border border-border/50 shadow-2xl p-2 min-w-[220px] max-h-[calc(100dvh-8rem)] overflow-y-auto overscroll-contain">
+      <div className="rounded-[18px] bg-card border border-border shadow-[var(--vt-shadow-pop)] p-2 min-w-[220px] max-h-[calc(100dvh-8rem)] overflow-y-auto overscroll-contain">
         {items.map((item, index) => {
           const isActive = currentPath.startsWith(item.path);
           const Icon = item.icon;

@@ -19,7 +19,7 @@ const SECTIONS = [
       'Clique em "Meus Apps" → "Criar App"',
       'Em tipo, selecione "Outro" e clique em "Avançar"',
       'Selecione "Business" como categoria e clique em "Avançar"',
-      'Dê um nome ao app (ex: "Log Pose Integration") e clique em "Criar App"',
+      'Dê um nome ao app (ex: "Vale Tec Integracao") e clique em "Criar App"',
       'Associe o app ao seu Business Manager quando solicitado',
     ],
   },
@@ -39,7 +39,7 @@ const SECTIONS = [
     steps: [
       'Acesse business.facebook.com → "Configurações do negócio"',
       'No menu lateral, vá em "Usuários" → "Usuários do sistema"',
-      'Clique em "Adicionar" e dê um nome (ex: "Log Pose Bot")',
+      'Clique em "Adicionar" e dê um nome (ex: "Vale Tec Bot")',
       'Defina o papel como "Administrador" e clique em "Criar usuário do sistema"',
     ],
   },
@@ -64,7 +64,7 @@ const SECTIONS = [
       'Em permissões, marque: ads_read, ads_management, business_management, read_insights',
       'Defina a validade como "Sem data de validade" (token permanente)',
       'Clique em "Gerar token" e copie o token exibido — guarde em local seguro!',
-      'Cole esse token no campo "Access Token" do modal de configuração aqui no Log Pose',
+      'Cole esse token no campo "Access Token" do modal de configuração aqui no painel',
     ],
   },
   {
@@ -73,7 +73,7 @@ const SECTIONS = [
     steps: [
       'Para o Ad Account ID: acesse business.facebook.com → "Contas de anúncio"',
       'Selecione a conta — o ID aparece no formato "act_XXXXXXXXXX" na URL e no painel',
-      'Cole apenas os números (sem "act_") no campo "Ad Account ID" do Log Pose',
+      'Cole apenas os números (sem "act_") no campo "Ad Account ID" do painel',
       'Para o BM ID (Business Manager): acesse business.facebook.com → "Configurações do negócio"',
       'O ID aparece na URL: business.facebook.com/XXXXXXXXXX/settings — copie esse número',
       'Alternativamente, em "Informações da empresa" o ID fica visível na página',

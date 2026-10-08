@@ -11,18 +11,18 @@ export interface FunnelGeometry {
   stagePoints: { cx: number; topY: number; bottomY: number }[];
 }
 
-// Theme madeira - amber/wood gradient palette (left=bright → right=deep)
+// Azuis da marca Vale Tec: do azul claro (topo do funil) ao azul-marinho (fundo)
 const FUNNEL_COLORS = [
-  "oklch(0.82 0.13 65)",
-  "oklch(0.75 0.16 58)",
-  "oklch(0.68 0.18 52)",
-  "oklch(0.62 0.19 47)",
-  "oklch(0.56 0.18 43)",
-  "oklch(0.50 0.16 40)",
-  "oklch(0.44 0.14 38)",
-  "oklch(0.38 0.12 36)",
-  "oklch(0.34 0.10 35)",
-  "oklch(0.30 0.08 34)",
+  "#8BBCE4",
+  "#6AA9DE",
+  "#4A97D6",
+  "#3898E6",
+  "#2A86D0",
+  "#1977C4",
+  "#1567AB",
+  "#125891",
+  "#0E4673",
+  "#0B3456",
 ];
 
 export const SVG_W = 900;

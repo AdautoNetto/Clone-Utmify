@@ -21,11 +21,11 @@ export function LoginForm({ onSubmit, error, loading }: LoginFormProps) {
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-black/50 backdrop-blur-xl shadow-2xl p-6">
-      <h2 className="text-lg font-semibold text-white mb-5">Entrar</h2>
+    <div className="rounded-[18px] border border-border bg-card shadow-[var(--vt-shadow-card)] p-6">
+      <h2 className="text-lg font-bold text-foreground mb-5 lg:hidden">Entrar</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="login-email" className="text-white/80">
+          <Label htmlFor="login-email" className="text-[12px] font-bold text-muted-foreground">
             Email
           </Label>
           <Input
@@ -35,12 +35,12 @@ export function LoginForm({ onSubmit, error, loading }: LoginFormProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+            className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="login-password" className="text-white/80">
+          <Label htmlFor="login-password" className="text-[12px] font-bold text-muted-foreground">
             Senha
           </Label>
           <div className="relative">
@@ -51,12 +51,12 @@ export function LoginForm({ onSubmit, error, loading }: LoginFormProps) {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+              className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showPassword ? (
                 <RiEyeOffLine className="size-4" />
@@ -68,10 +68,10 @@ export function LoginForm({ onSubmit, error, loading }: LoginFormProps) {
         </div>
 
         {error && (
-          <p className="text-sm text-red-400 text-center">{error}</p>
+          <p className="text-sm text-destructive text-center">{error}</p>
         )}
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full h-11 rounded-[11px] font-bold" disabled={loading}>
           {loading ? "Entrando..." : "Entrar"}
         </Button>
       </form>

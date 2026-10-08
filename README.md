@@ -1,6 +1,10 @@
+> **Vale Tec — rastreio de vendas.** Esta versão usa a identidade visual da Vale Tec (mesmo design
+> system do SaaS da academia: azul-marinho, azul #1977C4, amarelo, Plus Jakarta Sans + Sora) e traz
+> as correções de confiabilidade descritas em [`deploy/LEIA-ME.md`](deploy/LEIA-ME.md).
+> Baseado no projeto open-source **Log Pose** da Ilumin Cloud (licença MIT); o texto original segue abaixo.
+
 <div align="center">
-  <!-- Substitua pelo link da imagem do banner/logo do App -->
-  <img src="/frontend/public/logo_dark.webp" alt="Banner do Log Pose" width="200" />
+  <img src="/frontend/public/favicon.svg" alt="Vale Tec" width="96" />
 
   <h1>Log Pose</h1>
   <p>O dashboard definitivo para CEOs de Direct Response. Navegue pelos seus dados de tráfego e vendas com a precisão de um pirata rumo a Laugh Tale.</p>

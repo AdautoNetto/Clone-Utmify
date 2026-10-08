@@ -2,13 +2,8 @@ import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { FunnelProduct } from "@/services/funnel";
 
-// Theme madeira bar colors - distinct enough for comparison
-const BAR_COLORS = [
-  "oklch(0.72 0.17 50)",   // amber primary
-  "oklch(0.62 0.19 45)",   // burnt orange
-  "oklch(0.82 0.13 65)",   // warm gold
-  "oklch(0.52 0.16 42)",   // walnut
-];
+// Paleta de gráfico da Vale Tec (mesma ordem do --chart-*): azul, amarelo de gráfico, teal, marinho
+const BAR_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)"];
 
 function formatNumber(v: number): string {
   if (v >= 1_000_000) return `${(v / 1_000_000).toFixed(1)}M`;

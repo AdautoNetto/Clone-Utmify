@@ -1,15 +1,19 @@
 {
-  "name": "LOG POSE | Dashboard",
-  "short_name": "LOG POSE",
-  "description": "Dashboard Estratégico de Performance para Direct Response",
+  "name": "Vale Tec · Rastreio de vendas",
+  "short_name": "Vale Tec",
+  "description": "Vendas, anúncios e lucro num só painel",
   "start_url": "/dashboard",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
-  "background_color": "#0f172a",
-  "theme_color": "#0f172a",
+  "background_color": "#0B3456",
+  "theme_color": "#0B3456",
   "lang": "pt-BR",
-  "categories": ["business", "finance", "productivity"],
+  "categories": [
+    "business",
+    "finance",
+    "productivity"
+  ],
   "icons": [
     {
       "src": "/icons/pwa-192.png",

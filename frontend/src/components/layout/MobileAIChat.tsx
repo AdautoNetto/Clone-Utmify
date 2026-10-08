@@ -169,7 +169,7 @@ function MobileAIChatHeader({
             <RiMessageAi3Line className="size-4 text-blue-500" />
           </div>
           <div>
-            <h3 className="text-sm font-semibold">LOG POSE AI</h3>
+            <h3 className="text-sm font-semibold">Vale Tec IA</h3>
             <p className="text-[10px] text-muted-foreground">
               Assistente Inteligente
             </p>

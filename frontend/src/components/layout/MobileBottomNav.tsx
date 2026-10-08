@@ -29,7 +29,7 @@ import { useAdvancedFeatures } from "@/contexts/AdvancedFeaturesContext";
 type UserRole = "owner" | "admin" | "viewer";
 
 const NAV_ITEMS = [
-  { label: "Dashboard", icon: RiDashboardLine, path: "/dashboard" },
+  { label: "Painel", icon: RiDashboardLine, path: "/dashboard" },
   { label: "Campanhas", icon: RiMegaphoneLine, path: "/campaigns" },
   { label: "IA", icon: RiMessageAi3Line, path: "__ai__", isAI: true },
   { label: "Empresa", icon: RiBuildingLine, path: "/company" },
@@ -101,9 +101,18 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
     setIsMoreOpen(false);
   };
 
+  // Barra inferior branca de largura total, como a .tabbar do SaaS Vale Tec
+  const itemClass = (active: boolean) =>
+    `flex h-full w-full flex-col items-center justify-center gap-[3px] text-[11px] font-bold transition-colors ${
+      active ? "text-[#0B3456] dark:text-white" : "text-muted-foreground"
+    }`;
+
   return (
-    <nav className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-3 right-3 z-50 md:hidden">
-      <div className="flex items-center justify-around rounded-2xl bg-card/95 backdrop-blur-xl border border-border/50 shadow-xl px-2 py-1.5">
+    <nav
+      aria-label="Navegação principal"
+      className="fixed inset-x-0 bottom-0 z-50 md:hidden border-t border-border bg-card pb-[env(safe-area-inset-bottom)]"
+    >
+      <div className="grid h-[var(--vt-tabbar-h)] grid-cols-5">
         {NAV_ITEMS.map((item) => {
           const isActive =
             !item.isAI &&
@@ -113,24 +122,19 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
 
           if (item.isAI) {
             return (
-              <button
-                key={item.label}
-                onClick={onOpenAI}
-                className="flex flex-col items-center justify-center -mt-5 group"
-              >
-                <div className="rounded-full p-3 bg-primary text-primary-foreground shadow-lg shadow-primary/30 group-active:scale-90 transition-transform">
-                  <Icon className="size-5" />
-                </div>
-                <span className="text-[10px] font-semibold mt-0.5 text-primary">
-                  {item.label}
+              <button key={item.label} type="button" onClick={onOpenAI} className={itemClass(false)}>
+                <span className="flex size-7 items-center justify-center rounded-[9px] bg-[var(--vt-yellow)] text-[#0B3456]">
+                  <Icon className="size-[18px]" />
                 </span>
+                {item.label}
               </button>
             );
           }
 
           if (item.isMore) {
+            const active = isMoreActive || isMoreOpen;
             return (
-              <div key={item.label} ref={moreRef} className="relative">
+              <div key={item.label} ref={moreRef} className="relative h-full">
                 <MoreDropdown
                   isOpen={isMoreOpen}
                   items={moreItems}
@@ -139,27 +143,13 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
                   onLogout={handleLogout}
                 />
                 <button
+                  type="button"
+                  aria-expanded={isMoreOpen}
                   onClick={() => setIsMoreOpen((prev) => !prev)}
-                  className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-colors ${
-                    isMoreActive || isMoreOpen
-                      ? "text-primary"
-                      : "text-muted-foreground"
-                  }`}
+                  className={itemClass(active)}
                 >
-                  <Icon
-                    className={`size-5 ${
-                      isMoreActive || isMoreOpen ? "text-primary" : ""
-                    }`}
-                  />
-                  <span
-                    className={`text-[10px] mt-0.5 ${
-                      isMoreActive || isMoreOpen
-                        ? "font-semibold"
-                        : "font-medium"
-                    }`}
-                  >
-                    {item.label}
-                  </span>
+                  <Icon className="size-[22px]" />
+                  {item.label}
                 </button>
               </div>
             );
@@ -168,19 +158,13 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
           return (
             <button
               key={item.label}
+              type="button"
+              aria-current={isActive ? "page" : undefined}
               onClick={() => navigate(item.path)}
-              className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-xl transition-colors ${
-                isActive ? "text-primary" : "text-muted-foreground"
-              }`}
+              className={itemClass(isActive)}
             >
-              <Icon className={`size-5 ${isActive ? "text-primary" : ""}`} />
-              <span
-                className={`text-[10px] mt-0.5 ${
-                  isActive ? "font-semibold" : "font-medium"
-                }`}
-              >
-                {item.label}
-              </span>
+              <Icon className="size-[22px]" />
+              {item.label}
             </button>
           );
         })}

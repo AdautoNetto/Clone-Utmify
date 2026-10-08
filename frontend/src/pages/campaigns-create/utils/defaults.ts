@@ -1,5 +1,5 @@
 /**
- * UTM parameters padrão para campanhas do LOG POSE.
+ * UTM parameters padrão para campanhas do painel.
  * Formato idêntico ao Facebook Ads — campo único.
  */
 export const DEFAULT_UTM_PARAMS =

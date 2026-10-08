@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginUser } from "@/services/auth";
 import { LoginForm } from "./form";
+import { AuthShell } from "@/components/brand/AuthShell";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -23,39 +24,8 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: "url('/bg_login.webp')" }}
-    >
-      {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-black/10" />
-
-      <div className="relative z-10 w-full max-w-md space-y-8">
-        {/* Logo */}
-        <div className="flex flex-col items-center gap-3">
-          <img
-            src="/logo_dark.webp"
-            alt="LOG POSE"
-            className="h-14 w-auto object-contain drop-shadow-lg"
-          />
-          <p className="text-sm text-white/70">
-            Faça login para acessar o dashboard
-          </p>
-        </div>
-
-        <LoginForm onSubmit={handleSubmit} error={error} loading={loading} />
-
-        <div className="flex justify-center">
-          <a
-            href="https://ilumin.app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-white/50 hover:text-white/80 transition-colors"
-          >
-            Powered by Ilumin
-          </a>
-        </div>
-      </div>
-    </div>
+    <AuthShell title="Entrar" subtitle="Acesse o painel de vendas">
+      <LoginForm onSubmit={handleSubmit} error={error} loading={loading} />
+    </AuthShell>
   );
 }

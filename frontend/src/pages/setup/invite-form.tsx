@@ -31,22 +31,22 @@ export function InviteSetupForm({ name, role, onSubmit, error, loading }: Invite
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-black/50 backdrop-blur-xl shadow-2xl p-6">
+    <div className="rounded-[18px] border border-border bg-card shadow-[var(--vt-shadow-card)] p-6">
       <div className="flex items-center justify-between mb-5">
-        <h2 className="text-lg font-semibold text-white">Criar sua conta</h2>
-        <Badge variant="outline" className="text-[10px] text-white/70 border-white/20">
+        <h2 className="text-lg font-bold text-foreground">Criar sua conta</h2>
+        <Badge variant="outline" className="text-[10px] text-muted-foreground border-border">
           {roleLabels[role] ?? role}
         </Badge>
       </div>
 
-      <div className="mb-4 rounded-lg bg-white/5 border border-white/10 px-3 py-2.5">
-        <p className="text-xs text-white/50">Você foi convidado como</p>
-        <p className="text-sm font-medium text-white">{name}</p>
+      <div className="mb-4 rounded-[11px] bg-secondary border border-border px-3 py-2.5">
+        <p className="text-xs text-muted-foreground">Você foi convidado como</p>
+        <p className="text-sm font-bold text-foreground">{name}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="invite-email" className="text-white/80">Email</Label>
+          <Label htmlFor="invite-email" className="text-[12px] font-bold text-muted-foreground">Email</Label>
           <Input
             id="invite-email"
             type="email"
@@ -54,12 +54,12 @@ export function InviteSetupForm({ name, role, onSubmit, error, loading }: Invite
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+            className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="invite-password" className="text-white/80">Senha</Label>
+          <Label htmlFor="invite-password" className="text-[12px] font-bold text-muted-foreground">Senha</Label>
           <div className="relative">
             <Input
               id="invite-password"
@@ -69,12 +69,12 @@ export function InviteSetupForm({ name, role, onSubmit, error, loading }: Invite
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+              className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showPassword ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
             </button>
@@ -82,7 +82,7 @@ export function InviteSetupForm({ name, role, onSubmit, error, loading }: Invite
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="invite-confirm" className="text-white/80">Confirmar Senha</Label>
+          <Label htmlFor="invite-confirm" className="text-[12px] font-bold text-muted-foreground">Confirmar Senha</Label>
           <div className="relative">
             <Input
               id="invite-confirm"
@@ -92,21 +92,21 @@ export function InviteSetupForm({ name, role, onSubmit, error, loading }: Invite
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={6}
-              className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+              className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
             />
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showConfirm ? <RiEyeOffLine className="size-4" /> : <RiEyeLine className="size-4" />}
             </button>
           </div>
         </div>
 
-        {error && <p className="text-sm text-red-400 text-center">{error}</p>}
+        {error && <p className="text-sm text-destructive text-center">{error}</p>}
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full h-11 rounded-[11px] font-bold" disabled={loading}>
           {loading ? "Criando..." : "Criar Conta"}
         </Button>
       </form>

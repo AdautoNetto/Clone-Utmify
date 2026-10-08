@@ -4,6 +4,7 @@ import { createAdmin } from "@/services/auth";
 import { getInviteInfo, completeInvite } from "@/services/users";
 import { SetupForm } from "./form";
 import { InviteSetupForm } from "./invite-form";
+import { AuthShell } from "@/components/brand/AuthShell";
 
 export default function SetupPage() {
   const navigate = useNavigate();
@@ -87,17 +88,17 @@ export default function SetupPage() {
       if (inviteLoading) {
         return (
           <div className="flex items-center justify-center py-12">
-            <div className="h-6 w-6 animate-spin rounded-full border-3 border-white border-t-transparent" />
+            <div className="h-6 w-6 animate-spin rounded-full border-3 border-primary border-t-transparent" />
           </div>
         );
       }
       if (inviteError) {
         return (
-          <div className="rounded-xl border border-white/10 bg-black/50 backdrop-blur-xl shadow-2xl p-6 text-center space-y-3">
-            <p className="text-red-400 font-medium">{inviteError}</p>
-            <p className="text-white/50 text-sm">
+          <div className="rounded-[18px] border border-border bg-card shadow-[var(--vt-shadow-card)] p-6 text-center space-y-3">
+            <p className="text-destructive font-medium">{inviteError}</p>
+            <p className="text-muted-foreground text-sm">
               Redirecionando para o login em{" "}
-              <span className="text-white font-medium">{redirectCountdown}s</span>...
+              <span className="text-foreground font-bold">{redirectCountdown}s</span>...
             </p>
           </div>
         );
@@ -116,26 +117,15 @@ export default function SetupPage() {
   };
 
   return (
-    <div
-      className="flex min-h-screen items-center justify-center p-4 bg-cover bg-center bg-no-repeat relative"
-      style={{ backgroundImage: "url('/bg_login.webp')" }}
+    <AuthShell
+      title={inviteToken ? "Criar sua conta" : "Configuração inicial"}
+      subtitle={
+        inviteToken
+          ? "Configure sua conta para acessar o painel"
+          : "Crie a conta do dono para começar"
+      }
     >
-      <div className="absolute inset-0 bg-black/10" />
-      <div className="relative z-10 w-full max-w-md space-y-8">
-        <div className="flex flex-col items-center gap-3">
-          <img
-            src="/logo_dark.webp"
-            alt="LOG POSE"
-            className="h-14 w-auto object-contain drop-shadow-lg"
-          />
-          <p className="text-sm text-white/70 text-center">
-            {inviteToken
-              ? "Configure sua conta para acessar o Log Pose"
-              : "Configure sua conta de administrador para começar"}
-          </p>
-        </div>
-        {renderContent()}
-      </div>
-    </div>
+      {renderContent()}
+    </AuthShell>
   );
 }

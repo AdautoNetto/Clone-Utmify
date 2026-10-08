@@ -26,6 +26,7 @@ import {
 import { SidebarNavGroup } from "./SidebarNavGroup";
 import { SidebarUser } from "./SidebarUser";
 import { AiTrainingProfile } from "./AiTrainingProfile";
+import { ValeLogo } from "@/components/brand/ValeLogo";
 import { getStoredUser } from "@/services/auth";
 import { useAdvancedFeatures } from "@/contexts/AdvancedFeaturesContext";
 import type { RemixiconComponentType } from "@remixicon/react";
@@ -116,17 +117,14 @@ export function AppSidebar() {
   const visibleGroups = filterNavGroups(navGroups, role, { ...features });
 
   return (
+    // Faixa azul-marinho de altura total, como o rail do SaaS Vale Tec
     <Sidebar
-      variant="floating"
+      variant="sidebar"
       collapsible="none"
-      className="rounded-xl overflow-hidden h-full"
+      className="h-full border-r-0 bg-sidebar"
     >
-      <SidebarHeader className="px-3 pt-3 pb-1">
-        <img
-          src="/logo_dark.webp"
-          alt="LOG POSE"
-          className="h-12 w-auto object-contain"
-        />
+      <SidebarHeader className="px-4 pt-6 pb-4">
+        <ValeLogo onNavy />
       </SidebarHeader>
       <SidebarContent className="px-2 gap-0">
         {visibleGroups.map((group) => (

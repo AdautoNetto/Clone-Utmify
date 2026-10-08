@@ -29,13 +29,13 @@ export function SetupForm({ onSubmit, error, loading }: SetupFormProps) {
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-black/50 backdrop-blur-xl shadow-2xl p-6">
-      <h2 className="text-lg font-semibold text-white mb-5">
+    <div className="rounded-[18px] border border-border bg-card shadow-[var(--vt-shadow-card)] p-6">
+      <h2 className="text-lg font-bold text-foreground mb-5 lg:hidden">
         Configuração Inicial
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="setup-name" className="text-white/80">
+          <Label htmlFor="setup-name" className="text-[12px] font-bold text-muted-foreground">
             Nome
           </Label>
           <Input
@@ -44,12 +44,12 @@ export function SetupForm({ onSubmit, error, loading }: SetupFormProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             required
-            className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+            className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="setup-email" className="text-white/80">
+          <Label htmlFor="setup-email" className="text-[12px] font-bold text-muted-foreground">
             Email
           </Label>
           <Input
@@ -59,12 +59,12 @@ export function SetupForm({ onSubmit, error, loading }: SetupFormProps) {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+            className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="setup-password" className="text-white/80">
+          <Label htmlFor="setup-password" className="text-[12px] font-bold text-muted-foreground">
             Senha
           </Label>
           <div className="relative">
@@ -76,12 +76,12 @@ export function SetupForm({ onSubmit, error, loading }: SetupFormProps) {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
-              className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+              className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
             />
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showPassword ? (
                 <RiEyeOffLine className="size-4" />
@@ -93,7 +93,7 @@ export function SetupForm({ onSubmit, error, loading }: SetupFormProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="setup-confirm" className="text-white/80">
+          <Label htmlFor="setup-confirm" className="text-[12px] font-bold text-muted-foreground">
             Confirmar Senha
           </Label>
           <div className="relative">
@@ -105,12 +105,12 @@ export function SetupForm({ onSubmit, error, loading }: SetupFormProps) {
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
               minLength={6}
-              className="bg-white/10 border-white/15 text-white placeholder:text-white/40 focus:border-primary"
+              className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
             />
             <button
               type="button"
               onClick={() => setShowConfirm(!showConfirm)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             >
               {showConfirm ? (
                 <RiEyeOffLine className="size-4" />
@@ -122,10 +122,10 @@ export function SetupForm({ onSubmit, error, loading }: SetupFormProps) {
         </div>
 
         {error && (
-          <p className="text-sm text-red-400 text-center">{error}</p>
+          <p className="text-sm text-destructive text-center">{error}</p>
         )}
 
-        <Button type="submit" className="w-full" disabled={loading}>
+        <Button type="submit" className="w-full h-11 rounded-[11px] font-bold" disabled={loading}>
           {loading ? "Criando..." : "Criar Conta"}
         </Button>
       </form>

@@ -218,7 +218,7 @@ export function IntegrationGuide() {
 
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-2.5">
             <p className="text-[10px] text-primary/80 leading-relaxed">
-              <strong>Dica:</strong> Após criar o endpoint aqui no Log Pose, copie
+              <strong>Dica:</strong> Após criar o endpoint aqui no painel, copie
               a URL gerada e cole na plataforma de pagamento seguindo o tutorial acima.
               Selecione todos os eventos para capturar vendas, reembolsos e abandonos.
             </p>
