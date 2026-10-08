@@ -52,7 +52,7 @@ export function KpiCard({
       <CardContent className="p-3 sm:p-5">
         <div className="flex items-start justify-between gap-2">
           <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground truncate">
+            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground line-clamp-2 break-words">
               {title}
             </p>
             <p
@@ -66,7 +66,7 @@ export function KpiCard({
               {displayValue}
             </p>
             {subtitle && (
-              <p className="text-xs text-muted-foreground truncate">{subtitle}</p>
+              <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-2 break-words">{subtitle}</p>
             )}
             {trend && (
               <div className="flex items-center gap-1">

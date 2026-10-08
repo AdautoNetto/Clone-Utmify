@@ -3,7 +3,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from database.core.connection import get_db
-from database.models.transaction import Transaction
+from database.models.transaction import Transaction, TransactionStatus
+from database.models.refund_reason import RefundReason
 from database.models.customer import Customer
 from database.models.customer_product import CustomerProduct
 from api.auth.deps import get_current_user
@@ -29,6 +30,18 @@ def delete_transaction(
         raise HTTPException(status_code=404, detail="Transação não encontrada")
 
     customer_id = tx.customer_id
+
+    # Se era venda aprovada, tirar do total do cliente (senão o "gasto total" fica inflado)
+    if customer_id and tx.status == TransactionStatus.APPROVED:
+        customer = db.query(Customer).filter(Customer.id == customer_id).first()
+        if customer:
+            customer.total_spent = max(0.0, (customer.total_spent or 0.0) - (tx.amount or 0.0))
+            customer.total_orders = max(0, (customer.total_orders or 0) - 1)
+
+    # O motivo de reembolso aponta para a transação (FK): apagar antes
+    db.query(RefundReason).filter(
+        RefundReason.transaction_id == transaction_id
+    ).delete(synchronize_session=False)
 
     # Apagar a transação
     db.delete(tx)

@@ -12,8 +12,21 @@ import {
   RiLoopLeftLine,
   RiBox3Line,
   RiFilter2Line,
+  RiRepeatLine,
+  RiWalletLine,
+  RiMetaLine,
+  RiPlayCircleLine,
+  RiBankCardLine,
+  RiGeminiLine,
+  RiTeamLine,
+  RiUserLine,
+  RiSettings3Line,
 } from "@remixicon/react";
-import { MoreDropdown } from "./MobileMoreDropdown";
+import { MoreDropdown, type MoreItem } from "./MobileMoreDropdown";
+import { getStoredUser, logout } from "@/services/auth";
+import { useAdvancedFeatures } from "@/contexts/AdvancedFeaturesContext";
+
+type UserRole = "owner" | "admin" | "viewer";
 
 const NAV_ITEMS = [
   { label: "Dashboard", icon: RiDashboardLine, path: "/dashboard" },
@@ -23,16 +36,25 @@ const NAV_ITEMS = [
   { label: "Mais", icon: RiMoreLine, path: "__more__", isMore: true },
 ];
 
-export const MORE_ITEMS = [
-  { label: "Vendas", icon: RiShoppingCartLine, path: "/sales" },
-  { label: "Clientes", icon: RiGroupLine, path: "/customers" },
-  { label: "Reembolsos", icon: RiRefundLine, path: "/refunds" },
-  { label: "Recuperação", icon: RiLoopLeftLine, path: "/recovery" },
-  { label: "Produtos", icon: RiBox3Line, path: "/products" },
-  { label: "Funil", icon: RiFilter2Line, path: "/funnel" },
+// Mesmas páginas do menu lateral do computador (AppSidebar), com as mesmas
+// regras de papel e de recurso — no celular nada pode ficar inacessível.
+const MORE_ITEMS: (MoreItem & { roles?: UserRole[]; featureKey?: "stripe_enabled" })[] = [
+  { group: "Análise", label: "Vendas", icon: RiShoppingCartLine, path: "/sales" },
+  { group: "Análise", label: "Clientes", icon: RiGroupLine, path: "/customers" },
+  { group: "Análise", label: "Reembolsos", icon: RiRefundLine, path: "/refunds" },
+  { group: "Análise", label: "Recuperação", icon: RiLoopLeftLine, path: "/recovery" },
+  { group: "Análise", label: "Produtos", icon: RiBox3Line, path: "/products" },
+  { group: "Análise", label: "Funil", icon: RiFilter2Line, path: "/funnel" },
+  { group: "Análise", label: "Assinatura", icon: RiRepeatLine, path: "/subscriptions", featureKey: "stripe_enabled" },
+  { group: "Integrações", label: "Plataformas", icon: RiWalletLine, path: "/platforms", roles: ["owner", "admin"] },
+  { group: "Integrações", label: "Facebook Ads", icon: RiMetaLine, path: "/facebook-ads", roles: ["owner", "admin"] },
+  { group: "Integrações", label: "VTurb", icon: RiPlayCircleLine, path: "/vturb", roles: ["owner", "admin"] },
+  { group: "Integrações", label: "Stripe", icon: RiBankCardLine, path: "/stripe", roles: ["owner", "admin"], featureKey: "stripe_enabled" },
+  { group: "Integrações", label: "Gemini API", icon: RiGeminiLine, path: "/gemini", roles: ["owner", "admin"] },
+  { group: "Conta", label: "Usuários", icon: RiTeamLine, path: "/users", roles: ["owner", "admin"] },
+  { group: "Conta", label: "Perfil", icon: RiUserLine, path: "/profile" },
+  { group: "Conta", label: "Opções Avançadas", icon: RiSettings3Line, path: "/advanced-settings", roles: ["owner"] },
 ];
-
-const MORE_PATHS = MORE_ITEMS.map((item) => item.path);
 
 interface MobileBottomNavProps {
   onOpenAI: () => void;
@@ -43,10 +65,24 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
   const navigate = useNavigate();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
+  const role: UserRole = getStoredUser()?.role ?? "owner";
+  const { features } = useAdvancedFeatures();
 
-  const isMoreActive = MORE_PATHS.some((p) =>
-    location.pathname.startsWith(p)
+  const moreItems = MORE_ITEMS.filter((item) => {
+    if (item.roles && !item.roles.includes(role)) return false;
+    if (item.featureKey && !features[item.featureKey]) return false;
+    return true;
+  });
+
+  const isMoreActive = moreItems.some((item) =>
+    location.pathname.startsWith(item.path)
   );
+
+  const handleLogout = () => {
+    setIsMoreOpen(false);
+    logout();
+    navigate("/login", { replace: true });
+  };
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -66,7 +102,7 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
   };
 
   return (
-    <nav className="fixed bottom-3 left-3 right-3 z-50 md:hidden">
+    <nav className="fixed bottom-[calc(0.75rem+env(safe-area-inset-bottom))] left-3 right-3 z-50 md:hidden">
       <div className="flex items-center justify-around rounded-2xl bg-card/95 backdrop-blur-xl border border-border/50 shadow-xl px-2 py-1.5">
         {NAV_ITEMS.map((item) => {
           const isActive =
@@ -97,9 +133,10 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
               <div key={item.label} ref={moreRef} className="relative">
                 <MoreDropdown
                   isOpen={isMoreOpen}
-                  items={MORE_ITEMS}
+                  items={moreItems}
                   currentPath={location.pathname}
                   onItemClick={handleMoreItemClick}
+                  onLogout={handleLogout}
                 />
                 <button
                   onClick={() => setIsMoreOpen((prev) => !prev)}

@@ -2,7 +2,8 @@ import os
 import mimetypes
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
+from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -46,6 +47,7 @@ from api.campaigns.conversion import router as campaigns_conversion_router
 from api.campaigns.ai_action import router as campaigns_ai_action_router
 from api.campaigns.export_details import router as campaigns_export_details_router
 from api.webhook.receive import router as webhook_receiver_router
+from api.webhook.events import router as webhook_events_router
 from api.csv_import.preview import router as import_preview_router
 from api.csv_import.execute import router as import_execute_router
 from api.refunds.list import router as refunds_list_router
@@ -68,6 +70,10 @@ from api.advanced_settings.features import router as advanced_settings_router
 from api.advanced_settings.reset_sales import router as reset_sales_router
 
 from database.core.migrate_sql import run_sql_migrations
+from database.core.connection import wait_for_database
+
+# O container do app pode subir antes do Postgres aceitar conexões
+wait_for_database()
 
 # Migrate ENUM columns → VARCHAR (idempotent, runs on every boot)
 run_enum_migrations(engine)
@@ -80,6 +86,18 @@ Base.metadata.create_all(bind=engine)
 run_sql_migrations()
 
 app = FastAPI(title="ConvergeAI API")
+
+
+@app.get("/api/health", include_in_schema=False)
+def health():
+    """Usado pelo healthcheck do Docker/Coolify e por monitor externo (ex.: UptimeRobot)."""
+    try:
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+    except Exception:
+        return JSONResponse(status_code=503, content={"status": "error", "database": "down"})
+    return {"status": "ok", "database": "ok"}
+
 
 # CORS for development
 app.add_middleware(
@@ -124,6 +142,7 @@ app.include_router(campaigns_conversion_router, prefix="/api")
 app.include_router(campaigns_ai_action_router, prefix="/api")
 app.include_router(campaigns_export_details_router, prefix="/api")
 app.include_router(webhook_receiver_router, prefix="/api")
+app.include_router(webhook_events_router, prefix="/api")
 app.include_router(import_preview_router, prefix="/api")
 app.include_router(import_execute_router, prefix="/api")
 app.include_router(refunds_list_router, prefix="/api")

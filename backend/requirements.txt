@@ -1,15 +1,24 @@
-fastapi
-uvicorn[standard]
-sqlalchemy
-psycopg2-binary
-python-jose[cryptography]
-bcrypt
-python-dotenv
-pydantic[email]
-alembic
-httpx
-openpyxl
-python-multipart
-langchain
-langchain-google-genai
-stripe
+# Versões FIXAS e testadas. Sem fixar, cada build pega a última versão de tudo
+# e o app quebra sozinho (ex.: SQLAlchemy 2.1 trocou o driver padrão do Postgres
+# e o container nem sobe). Para atualizar: mude aqui, rode os testes, faça o deploy.
+fastapi==0.143.0
+starlette==1.7.0
+uvicorn[standard]==0.54.0
+sqlalchemy==2.0.54
+psycopg2-binary==2.9.13
+python-jose[cryptography]==3.5.0
+bcrypt==5.0.0
+python-dotenv==1.2.4
+pydantic[email]==2.14.0
+email-validator==2.3.0
+alembic==1.20.0
+httpx==0.28.1
+openpyxl==3.1.5
+python-multipart==0.0.32
+langchain==1.4.3
+langchain-core==1.6.8
+langchain-google-genai==4.4.0
+stripe==16.0.0
+# Base de fusos horários: a imagem python:slim (Debian 13) não traz /usr/share/zoneinfo
+# e sem isso ZoneInfo("America/Sao_Paulo") derruba o app na inicialização.
+tzdata==2026.5

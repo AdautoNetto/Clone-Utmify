@@ -17,3 +17,5 @@ docs/
 ilumin.md
 GEMINI.md
 README.md
+backend/tests/
+deploy/

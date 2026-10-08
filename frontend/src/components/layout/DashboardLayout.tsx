@@ -9,15 +9,16 @@ import { IntroVideo } from "./IntroVideo";
 
 export function DashboardLayout() {
   const isMobile = useIsMobile();
-  // On mobile, auto-open AI chat on first load
-  const [aiOpen, setAiOpen] = useState(isMobile);
+  // Chat da IA começa fechado: abrir sozinho escondia o painel a cada carregamento no celular
+  const [aiOpen, setAiOpen] = useState(false);
 
   if (isMobile) {
     return (
       <>
         <IntroVideo />
-        <div className="flex flex-col min-h-[100dvh]">
-          <main className="flex-1 overflow-auto pb-20">
+        {/* safe-area: no iPhone como app (status bar translúcida) o conteúdo não fica sob o relógio nem sob a barra de início */}
+        <div className="flex flex-col min-h-[100dvh] pt-[env(safe-area-inset-top)]">
+          <main className="flex-1 overflow-auto pb-[calc(5rem+env(safe-area-inset-bottom))]">
             <div className="mx-auto w-full min-h-full">
               <Outlet />
             </div>

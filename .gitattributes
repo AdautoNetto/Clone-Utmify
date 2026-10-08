@@ -1,0 +1,4 @@
+# Scripts rodam em Linux (containers/VPS): sempre LF, mesmo vindo de Windows
+*.sh text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf

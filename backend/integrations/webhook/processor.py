@@ -1,4 +1,5 @@
 import logging
+from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from integrations.webhook.schemas import StandardizedWebhookEvent
@@ -20,6 +21,43 @@ def get_saopaulo_time():
     return now_sp()
 
 
+_WEBHOOK_LOCK_KEY = 74_201_605  # número arbitrário, só identifica a trava
+
+# Ordem do ciclo de vida de uma venda. Só se avança, nunca se volta.
+_STATUS_RANK = {
+    TransactionStatus.PENDING: 0,
+    TransactionStatus.TRIAL: 1,
+    TransactionStatus.APPROVED: 2,
+    TransactionStatus.REFUNDED: 3,
+    TransactionStatus.CHARGEBACK: 3,
+}
+
+_FILLABLE_FIELDS = (
+    "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+    "src", "checkout_url", "webhook_slug", "product_name",
+)
+
+
+def _grant_product(db: Session, customer_id: int, product_id: int):
+    """Libera o produto para o cliente (junction CustomerProduct), sem duplicar."""
+    already_has = db.query(CustomerProduct).filter(
+        CustomerProduct.customer_id == customer_id,
+        CustomerProduct.product_id == product_id,
+    ).first()
+    if not already_has:
+        db.add(CustomerProduct(customer_id=customer_id, product_id=product_id))
+
+
+def _fill_missing_fields(tx: Transaction, event: StandardizedWebhookEvent):
+    """Completa campos vazios da transação com o que chegou no evento mais novo."""
+    for field in _FILLABLE_FIELDS:
+        value = getattr(event, field, None)
+        if value and not getattr(tx, field):
+            setattr(tx, field, value)
+    if event.order_bumps and not tx.order_bumps:
+        tx.order_bumps = event.order_bumps
+
+
 def process_webhook_event(db: Session, event: StandardizedWebhookEvent):
     """
     Processa um evento padronizado de webhook, atualizando as tabelas:
@@ -29,7 +67,12 @@ def process_webhook_event(db: Session, event: StandardizedWebhookEvent):
     4. Recovery (cria registro de recuperação se for pendente)
     """
     logger.info(f"Processando webhook event: {event.external_id} | Status: {event.status}")
-    
+
+    # Um webhook por vez (trava liberada no commit/rollback). Sem isso, vendas
+    # simultâneas do mesmo cliente perdem soma em total_spent/total_orders, e o
+    # mesmo produto novo pode ser criado duas vezes. Cada evento leva milissegundos.
+    db.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": _WEBHOOK_LOCK_KEY})
+
     # -------------------------------------------------------------
     # 1. PROCESSAMENTO DO CUSTOMER
     # -------------------------------------------------------------
@@ -64,18 +107,43 @@ def process_webhook_event(db: Session, event: StandardizedWebhookEvent):
     
     if existing_tx:
         logger.info(f"Transação {event.external_id} já existia. Status: {existing_tx.status} -> {event.status}")
-        is_newly_approved = existing_tx.status != TransactionStatus.APPROVED and event.status == TransactionStatus.APPROVED
+        _fill_missing_fields(existing_tx, event)
+
+        # Webhooks chegam fora de ordem (retries, filas). Um evento "atrasado"
+        # nunca pode rebaixar o status: approved → pending faria a venda sumir
+        # das métricas; refunded → approved ressuscitaria uma venda devolvida.
+        if _STATUS_RANK[event.status] <= _STATUS_RANK[existing_tx.status]:
+            if event.status != existing_tx.status:
+                logger.warning(
+                    f"Ignorando mudança de status fora de ordem em {event.external_id}: "
+                    f"{existing_tx.status} -> {event.status}"
+                )
+            db.commit()
+            return existing_tx
+
+        is_newly_approved = event.status == TransactionStatus.APPROVED
         is_newly_refunded = existing_tx.status == TransactionStatus.APPROVED and event.status in [TransactionStatus.REFUNDED, TransactionStatus.CHARGEBACK]
-        
+
+        # O pendente às vezes chega sem valor (ex.: abandono); o aprovado traz o valor real
+        if is_newly_approved and event.amount > 0:
+            existing_tx.amount = event.amount
+
         existing_tx.status = event.status
-        
+
         if is_newly_approved:
-            customer.total_spent += event.amount
+            customer.total_spent += existing_tx.amount
             customer.total_orders += 1
             customer.last_purchase_at = get_saopaulo_time()
             if not customer.first_purchase_at:
                 customer.first_purchase_at = customer.last_purchase_at
             mark_recovery_as_recovered(db, event.customer_email, event.product_name, event.src)
+
+            if not existing_tx.product_id:
+                product = ensure_product_from_webhook(db, event)
+                if product:
+                    existing_tx.product_id = product.id
+            if existing_tx.product_id:
+                _grant_product(db, customer.id, existing_tx.product_id)
                 
         elif is_newly_refunded:
             customer.total_spent -= existing_tx.amount
@@ -141,17 +209,7 @@ def process_webhook_event(db: Session, event: StandardizedWebhookEvent):
     # 4. LIBERAR ACESSO AO PRODUTO (Junction CustomerProduct)
     # -------------------------------------------------------------
     if product and event.status == TransactionStatus.APPROVED:
-        already_has = db.query(CustomerProduct).filter(
-            CustomerProduct.customer_id == customer.id,
-            CustomerProduct.product_id == product.id
-        ).first()
-        
-        if not already_has:
-            new_cp = CustomerProduct(
-                customer_id=customer.id,
-                product_id=product.id,
-            )
-            db.add(new_cp)
+        _grant_product(db, customer.id, product.id)
 
     # -------------------------------------------------------------
     # 5. CRIAR RECOVERY SE PENDENTE

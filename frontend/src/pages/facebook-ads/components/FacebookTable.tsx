@@ -63,6 +63,17 @@ function StatusBadge({ tokenValid }: { tokenValid: boolean }) {
 export function FacebookTable({
   accounts, isLoading, onDelete, onDeleteGroup, onDuplicate, onSync, onUpdateToken,
 }: FacebookTableProps) {
+  // Hooks antes de qualquer return: o React exige a mesma ordem em todo render
+  const grouped = useMemo(() => {
+    const map: Record<string, FacebookAccountAPI[]> = {};
+    for (const account of accounts) {
+      const groupKey = account.business_id || `solo_${account.id}`;
+      if (!map[groupKey]) map[groupKey] = [];
+      map[groupKey].push(account);
+    }
+    return Object.entries(map);
+  }, [accounts]);
+
   if (isLoading) return <TableSkeleton />;
 
   if (accounts.length === 0) {
@@ -76,16 +87,6 @@ export function FacebookTable({
       </Card>
     );
   }
-
-  const grouped = useMemo(() => {
-    const map: Record<string, FacebookAccountAPI[]> = {};
-    for (const account of accounts) {
-      const groupKey = account.business_id || `solo_${account.id}`;
-      if (!map[groupKey]) map[groupKey] = [];
-      map[groupKey].push(account);
-    }
-    return Object.entries(map);
-  }, [accounts]);
 
   return (
     <Card className="border-border/40 premium-table">

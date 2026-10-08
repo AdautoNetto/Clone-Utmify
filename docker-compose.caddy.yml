@@ -1,0 +1,20 @@
+# Só para Docker puro (SEM Coolify): adiciona o Caddy, que coloca o HTTPS
+# (cadeado) sozinho e renova o certificado. Uso:
+#   docker compose -f docker-compose.vps.yml -f docker-compose.caddy.yml up -d --build
+# Precisa: DOMINIO no .env e o DNS do domínio apontando para o IP da VPS.
+services:
+  caddy:
+    image: caddy:2-alpine
+    command: caddy reverse-proxy --from ${DOMINIO:?defina DOMINIO} --to app:8000
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - logpose_caddy_data:/data
+    depends_on:
+      - app
+    restart: unless-stopped
+
+volumes:
+  logpose_caddy_data:
+    name: logpose_caddy_data

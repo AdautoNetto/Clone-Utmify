@@ -8,6 +8,7 @@ from database.models.recovery import Recovery, RecoveryType, RecoveryChannel
 from database.models.facebook_account import FacebookAccount
 from database.models.vturb_account import VturbAccount
 from database.models.webhook_endpoint import WebhookEndpoint, WebhookPlatform
+from database.models.webhook_event import WebhookEvent
 from database.models.customer_product import CustomerProduct
 from database.models.recovery_channel_config import RecoveryChannelConfig
 from database.models.campaign_preset import CampaignPreset
@@ -39,6 +40,7 @@ __all__ = [
     "VturbAccount",
     "WebhookEndpoint",
     "WebhookPlatform",
+    "WebhookEvent",
     "CustomerProduct",
     "RecoveryChannelConfig",
     "CampaignPreset",

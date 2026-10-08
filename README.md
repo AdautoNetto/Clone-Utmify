@@ -58,6 +58,10 @@ Preparamos um guia passo a passo em vídeo. Mostramos o aplicativo por dentro e 
 
 ## Instalação Manual (Avançado)
 
+> **VPS própria com Coolify ou Docker puro, banco em volume persistente e backup diário automático:**
+> siga [`deploy/LEIA-ME.md`](deploy/LEIA-ME.md) (usa `docker-compose.vps.yml`). Testes do recebimento de
+> vendas: `TEST_DATABASE_URL=postgresql://... pytest backend/tests` (use um banco vazio e descartável).
+
 Se você tem experiência com infraestrutura cloud, gerenciamento de servidores Linux e prefere configurar o ambiente manualmente, utilize os arquivos `docker-compose` fornecidos.
 
 **Pré-requisitos Necessários:**
