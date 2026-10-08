@@ -13,6 +13,7 @@ import { PaginationBar } from "@/components/PaginationBar";
 import { ConfirmDeleteModal } from "@/components/ConfirmDeleteModal";
 import { deleteSale } from "@/services/sales";
 import { toast } from "sonner";
+import { getStoredUser } from "@/services/auth";
 
 const statusConfig: Record<string, { label: string; className: string }> = {
   approved: { label: "Aprovada", className: "bg-[var(--color-success)]/15 text-[var(--color-success)] border-transparent" },
@@ -39,6 +40,8 @@ export function SalesTable({ data, loading, total, page, onPageChange, onSaleDel
   const [selectedSale, setSelectedSale] = useState<SaleAPI | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<SaleAPI | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
+  // Visualizador é só leitura (o servidor também bloqueia)
+  const canDelete = getStoredUser()?.role !== "viewer";
 
   const handleDelete = async () => {
     if (!deleteTarget) return;
@@ -122,7 +125,7 @@ export function SalesTable({ data, loading, total, page, onPageChange, onSaleDel
                         <SaleActions
                           sale={sale}
                           onViewUtm={setSelectedSale}
-                          onDelete={setDeleteTarget}
+                          onDelete={canDelete ? setDeleteTarget : undefined}
                         />
                       </TableRow>
                     );
@@ -163,7 +166,7 @@ function SaleActions({
 }: {
   sale: SaleAPI;
   onViewUtm: (s: SaleAPI) => void;
-  onDelete: (s: SaleAPI) => void;
+  onDelete?: (s: SaleAPI) => void;
 }) {
   return (
     <TableCell className="text-center">
@@ -176,14 +179,16 @@ function SaleActions({
         >
           <RiEyeLine className="size-4 text-muted-foreground" />
         </Button>
-        <Button
-          variant="ghost" size="icon-sm"
-          onClick={() => onDelete(sale)}
-          className="hover:bg-destructive/10"
-          title="Apagar venda"
-        >
-          <RiDeleteBinLine className="size-4 text-muted-foreground hover:text-destructive" />
-        </Button>
+        {onDelete && (
+          <Button
+            variant="ghost" size="icon-sm"
+            onClick={() => onDelete(sale)}
+            className="hover:bg-destructive/10"
+            title="Apagar venda"
+          >
+            <RiDeleteBinLine className="size-4 text-muted-foreground hover:text-destructive" />
+          </Button>
+        )}
       </div>
     </TableCell>
   );

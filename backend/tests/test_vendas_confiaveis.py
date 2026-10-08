@@ -7,6 +7,7 @@ Use um banco VAZIO e descartável — os testes apagam tudo dele:
     TEST_DATABASE_URL=postgresql://postgres@localhost:5432/logpose_test pytest backend/tests -q
 """
 import os
+import re
 import uuid
 
 import pytest
@@ -211,3 +212,59 @@ def test_falha_interna_guarda_evento_e_reprocessa(ctx, monkeypatch):
 
 def test_eventos_exigem_login(ctx):
     assert client.get("/api/webhook-events").status_code in (401, 403)
+
+
+# ── Permissões: "viewer" (visualizador) é somente leitura ──────────────────
+
+_ROTAS_PUBLICAS = {"/api/login", "/api/setup", "/api/setup/invite/{token}", "/api/webhook/{platform}/{slug}"}
+_VIEWER_PODE = {("PUT", "/api/profile"), ("PUT", "/api/profile/password"),
+                ("POST", "/api/gemini/chat"), ("POST", "/api/gemini/daily-report")}
+
+
+def _login_com_papel(ctx, papel, email):
+    r = client.post("/api/users/invite", json={"name": papel, "role": papel}, headers=ctx["auth"])
+    assert r.status_code == 200, r.text
+    token = r.json()["invite_token"]
+    r = client.post(f"/api/setup/invite/{token}", json={
+        "email": email, "password": "senha-teste-123", "confirm_password": "senha-teste-123"})
+    assert r.status_code == 200, r.text
+    r = client.post("/api/login", json={"email": email, "password": "senha-teste-123"})
+    return {"Authorization": f"Bearer {r.json()['access_token']}"}
+
+
+def test_viewer_le_mas_nao_apaga_venda(ctx):
+    client.post(ctx["url"], json=_venda())
+    viewer = _login_com_papel(ctx, "viewer", "viewer@teste.com")
+    assert client.get("/api/sales/transactions", headers=viewer).status_code == 200
+    r = client.delete(f"/api/sales/transactions/{_tx('PED-1').id}", headers=viewer)
+    assert r.status_code == 403
+    assert _tx("PED-1").status == TransactionStatus.APPROVED  # continua lá
+    r = client.put("/api/profile", json={"name": "Novo nome", "email": "viewer@teste.com"}, headers=viewer)
+    assert r.status_code == 200, r.text
+
+
+def test_admin_continua_podendo_apagar(ctx):
+    client.post(ctx["url"], json=_venda())
+    admin = _login_com_papel(ctx, "admin", "admin@teste.com")
+    r = client.delete(f"/api/sales/transactions/{_tx('PED-1').id}", headers=admin)
+    assert r.status_code == 204, r.text
+
+
+def test_viewer_bloqueado_em_todas_as_rotas_de_escrita(ctx):
+    """Varre o app inteiro: qualquer rota de escrita (atual ou futura) tem que negar o viewer."""
+    viewer = _login_com_papel(ctx, "viewer", "viewer2@teste.com")
+    testadas, vazou = 0, []
+    # Lista oficial de rotas (OpenAPI): app.routes mudou de formato no FastAPI 0.14x
+    for path, metodos in app_module.app.openapi()["paths"].items():
+        if not path.startswith("/api") or path in _ROTAS_PUBLICAS:
+            continue
+        for method in (m.upper() for m in metodos):
+            if method in ("GET", "HEAD", "OPTIONS") or (method, path) in _VIEWER_PODE:
+                continue
+            url = re.sub(r"\{[^}]+\}", "1", path)
+            r = client.request(method, url, json={}, headers=viewer)
+            testadas += 1
+            if r.status_code != 403:
+                vazou.append(f"{method} {path} -> {r.status_code}")
+    assert testadas > 40
+    assert vazou == []
