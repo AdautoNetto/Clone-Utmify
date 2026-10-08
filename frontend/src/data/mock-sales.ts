@@ -4,7 +4,7 @@ export interface SaleRow {
   id: string;
   date: string;
   product: string;
-  platform: "kiwify" | "payt";
+  platform: "kiwify" | "payt" | "api";
   status: "approved" | "refunded" | "chargeback" | "pending" | "trial";
   amount: number;
   customerEmail: string;
@@ -17,6 +17,21 @@ export interface SaleRow {
 }
 
 export const salesData: SaleRow[] = [
+  {
+    id: "TXN-000",
+    date: "2026-03-09T15:10:00",
+    product: "Produto físico (loja própria)",
+    platform: "api",
+    status: "approved",
+    amount: 129.9,
+    customerEmail: "cl***@gmail.com",
+    utmCampaign: "Campaign - Loja Própria",
+    utmContent: "Ad - Vídeo Produto",
+    utmMedium: "Conjunto - Público Amplo",
+    utmSource: "facebook",
+    src: "",
+    origin: "facebook",
+  },
   {
     id: "TXN-001",
     date: "2026-03-09T14:32:00",

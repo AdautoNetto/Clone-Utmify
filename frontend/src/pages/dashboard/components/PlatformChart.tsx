@@ -10,6 +10,7 @@ const chartConfig = {
   value: { label: "Faturamento" },
   Kiwify: { label: "Kiwify", color: "var(--chart-1)" },
   PayT: { label: "PayT", color: "var(--chart-2)" },
+  API: { label: "API", color: "var(--chart-3)" },
 } satisfies ChartConfig;
 
 const COLORS = ["var(--color-chart-1)", "var(--color-chart-2)", "var(--color-chart-3)"];

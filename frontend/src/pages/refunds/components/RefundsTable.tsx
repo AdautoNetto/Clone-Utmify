@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card";
+import { PLATFORM_BADGE_COLORS, platformLabel } from "@/lib/platforms";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -22,10 +23,7 @@ interface RefundsTableProps {
   onAddReason: (item: RefundItem) => void;
 }
 
-const platformColors: Record<string, string> = {
-  kiwify: "bg-chart-1/15 text-chart-1 border-chart-1/20",
-  payt: "bg-chart-2/15 text-chart-2 border-chart-2/20",
-};
+const platformColors = PLATFORM_BADGE_COLORS;
 
 export function RefundsTable({
   data, loading, total, page, onPageChange, onAddReason,
@@ -100,7 +98,7 @@ function RefundRow({ item, onAddReason }: { item: RefundItem; onAddReason: (i: R
       </TableCell>
       <TableCell>
         <Badge variant="outline" className={`text-[10px] font-medium border ${platform}`}>
-          {item.platform === "kiwify" ? "Kiwify" : "PayT"}
+          {platformLabel(item.platform)}
         </Badge>
       </TableCell>
       <TableCell>

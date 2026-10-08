@@ -1,5 +1,6 @@
 import { getCookie, removeCookie } from "@/lib/cookies";
 import { getMockData } from "./mockInterceptor";
+import { IS_DEMO, getDemoData } from "./demoInterceptor";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
@@ -25,7 +26,7 @@ export async function apiRequest<T>(
     sessionStorage.removeItem("mock_mode");
   }
   
-  const isMock = sessionStorage.getItem("mock_mode") === "true";
+  const isMock = IS_DEMO || sessionStorage.getItem("mock_mode") === "true";
 
   if (isMock) {
     try {
@@ -37,6 +38,11 @@ export async function apiRequest<T>(
     } catch (e) {
       console.warn(`[Mock API] Error getting mock for ${endpoint}`, e);
     }
+  }
+
+  // Demonstração pública: nunca chama servidor (não existe um)
+  if (IS_DEMO) {
+    return getDemoData(endpoint, options.method || "GET") as T;
   }
 
   const { method = "GET", body, headers = {} } = options;

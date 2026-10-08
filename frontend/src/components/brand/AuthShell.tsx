@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { RiCheckLine } from "@remixicon/react";
 import { ValeLogo, ValeMark } from "./ValeLogo";
+import { IS_DEMO } from "@/services/demoInterceptor";
 
 /**
  * Moldura das telas de entrar / criar conta, no padrão do login do SaaS Vale Tec:
@@ -59,6 +60,12 @@ export function AuthShell({
             <h2 className="font-num text-[26px] font-bold text-foreground">{title}</h2>
             <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
           </div>
+          {IS_DEMO && (
+            <p className="mb-4 rounded-[11px] border border-border bg-secondary px-4 py-3 text-[13px] text-secondary-foreground">
+              <strong>Demonstração:</strong> entre com qualquer e-mail e senha. Os dados são de exemplo
+              e nada do que você fizer é salvo.
+            </p>
+          )}
           {children}
         </div>
       </main>

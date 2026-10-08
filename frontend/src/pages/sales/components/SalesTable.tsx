@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PLATFORM_BADGE_COLORS, platformLabel } from "@/lib/platforms";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
@@ -22,10 +23,7 @@ const statusConfig: Record<string, { label: string; className: string }> = {
   pending: { label: "Pendente", className: "" },
 };
 
-const platformColors: Record<string, string> = {
-  kiwify: "bg-chart-1/15 text-chart-1 border-chart-1/20",
-  payt: "bg-chart-2/15 text-chart-2 border-chart-2/20",
-};
+const platformColors = PLATFORM_BADGE_COLORS;
 
 interface SalesTableProps {
   data: SaleAPI[];
@@ -108,7 +106,7 @@ export function SalesTable({ data, loading, total, page, onPageChange, onSaleDel
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline" className={`text-[10px] font-medium border ${platform}`}>
-                            {sale.platform === "kiwify" ? "Kiwify" : "PayT"}
+                            {platformLabel(sale.platform)}
                           </Badge>
                         </TableCell>
                         <TableCell>

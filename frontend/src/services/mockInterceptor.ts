@@ -154,8 +154,8 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
         products: [{ id: 1, name: "Produto Mock" }],
         platforms: [{ value: "kiwify", label: "Kiwify" }],
         accounts: [
-          { slug: "act_123456789", name: "Log Pose - Oficial", platform: "facebook" },
-          { slug: "act_987654321", name: "Log Pose - Secundária", platform: "facebook" }
+          { slug: "act_123456789", name: "Conta Demo - Principal", platform: "facebook" },
+          { slug: "act_987654321", name: "Conta Demo - Secundária", platform: "facebook" }
         ],
         upsells: [],
         campaigns: ["Campanha Mock"]
@@ -195,8 +195,8 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
         products: [{ id: 1, name: "Produto Mock" }],
         platforms: [{ value: "kiwify", label: "Kiwify" }],
         accounts: [
-          { slug: "act_123456789", name: "Log Pose - Oficial", platform: "facebook" },
-          { slug: "act_987654321", name: "Log Pose - Secundária", platform: "facebook" }
+          { slug: "act_123456789", name: "Conta Demo - Principal", platform: "facebook" },
+          { slug: "act_987654321", name: "Conta Demo - Secundária", platform: "facebook" }
         ],
         upsells: []
       };
@@ -407,15 +407,15 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
 
   if (path === "/facebook/accounts") {
     return [
-      { id: 1, label: "Log Pose - Oficial", account_id: "act_123456789", access_token: "mock_token_1", created_at: "2026-01-01T00:00:00" },
-      { id: 2, label: "Log Pose - Secundária", account_id: "act_987654321", access_token: "mock_token_2", created_at: "2026-02-01T00:00:00" },
+      { id: 1, label: "Conta Demo - Principal", account_id: "act_123456789", access_token: "mock_token_1", created_at: "2026-01-01T00:00:00" },
+      { id: 2, label: "Conta Demo - Secundária", account_id: "act_987654321", access_token: "mock_token_2", created_at: "2026-02-01T00:00:00" },
     ];
   }
 
   if (path.startsWith("/users")) {
     return [
-      { id: 1, name: "Admin", email: "admin@logpose.com", role: "owner", status: "active", invite_token: null, created_at: "2026-01-01T00:00:00" },
-      { id: 2, name: "Gestor", email: "gestor@logpose.com", role: "admin", status: "active", invite_token: null, created_at: "2026-02-01T00:00:00" }
+      { id: 1, name: "Admin", email: "admin@exemplo.com", role: "owner", status: "active", invite_token: null, created_at: "2026-01-01T00:00:00" },
+      { id: 2, name: "Gestor", email: "gestor@exemplo.com", role: "admin", status: "active", invite_token: null, created_at: "2026-02-01T00:00:00" }
     ];
   }
 
@@ -434,7 +434,7 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
   if (path === "/campaigns/create/pixels") {
     return {
       pixels: [
-        { id: "px_1234567890", name: "Pixel Principal - Log Pose", last_fired_time: "2026-05-01T14:30:00" },
+        { id: "px_1234567890", name: "Pixel Principal - Demo", last_fired_time: "2026-05-01T14:30:00" },
         { id: "px_0987654321", name: "Pixel Secundário - Checkout", last_fired_time: "2026-04-30T22:10:00" },
       ],
     };
@@ -445,18 +445,18 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
       pages: [
         {
           id: "pg_111222333",
-          name: "Log Pose Oficial",
+          name: "Página Demo Oficial",
           picture: { data: { url: "https://ui-avatars.com/api/?name=Log+Pose&background=6366f1&color=fff&size=64" } },
         },
         {
           id: "pg_444555666",
-          name: "Log Pose - Marketing Digital",
+          name: "Página Demo - Marketing Digital",
           picture: { data: { url: "https://ui-avatars.com/api/?name=Marketing&background=10b981&color=fff&size=64" } },
         },
       ],
       instagram_accounts: [
-        { id: "ig_999888777", username: "logpose.oficial", profile_pic: "https://ui-avatars.com/api/?name=LP&background=e879f9&color=fff&size=64" },
-        { id: "ig_666555444", username: "logpose.marketing", profile_pic: "https://ui-avatars.com/api/?name=LM&background=f59e0b&color=fff&size=64" },
+        { id: "ig_999888777", username: "demo.oficial", profile_pic: "https://ui-avatars.com/api/?name=LP&background=e879f9&color=fff&size=64" },
+        { id: "ig_666555444", username: "demo.marketing", profile_pic: "https://ui-avatars.com/api/?name=LM&background=f59e0b&color=fff&size=64" },
       ],
     };
   }
@@ -492,8 +492,8 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
       ads_created: 2,
       errors: [],
       account_results: [
-        { account_id: 1, account_label: "Log Pose - Oficial", success: true, campaigns_created: 1, ads_created: 1, errors: [] },
-        { account_id: 2, account_label: "Log Pose - Secundária", success: true, campaigns_created: 1, ads_created: 1, errors: [] },
+        { account_id: 1, account_label: "Conta Demo - Principal", success: true, campaigns_created: 1, ads_created: 1, errors: [] },
+        { account_id: 2, account_label: "Conta Demo - Secundária", success: true, campaigns_created: 1, ads_created: 1, errors: [] },
       ],
     };
   }
@@ -510,7 +510,7 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
 
   if (path === "/gemini/accounts") {
     return [
-      { id: 1, name: "Log Pose AI", api_key: "AIza***mock***", model: "gemini-2.0-flash", created_at: "2026-01-10T00:00:00" },
+      { id: 1, name: "Vale Tec IA", api_key: "AIza***mock***", model: "gemini-2.0-flash", created_at: "2026-01-10T00:00:00" },
     ];
   }
 
@@ -537,7 +537,7 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
     } else if (msg.includes("relatório") || msg.includes("resumo")) {
       response = `## 📋 Relatório Geral — Hoje\n\n**Desempenho Atual:**\n- Faturamento: **R$ 137.250**\n- Gastos: R$ 46.350\n- Lucro: **R$ 90.900** (margem 66%)\n- Vendas: 981\n- ROAS médio: **3,06x**\n\n**Destaques:**\n✅ Mentoria Premium com ROAS 4,0x — escale com prioridade\n⚠️ Curso Marketing com ROAS 2,86 — revisar criativos\n🔴 PLR Bundle Pack pausado — aguardando otimização\n\n**Recomendação do dia:** Aloque mais verba na Mentoria Premium e teste novos criativos UGC no Curso Marketing Digital.`;
     } else {
-      response = `Olá! Sou a **LOG POSE AI**, sua assistente de análise de campanhas. 🧭\n\nPosso te ajudar com:\n\n- 📊 **Análise de ROAS, CPA e métricas** das suas campanhas\n- 🎯 **Recomendações** de quais campanhas escalar ou pausar\n- 💡 **Insights sobre criativos** de melhor desempenho\n- 📋 **Relatórios resumidos** da operação\n- 🚀 **Estratégias de escala** segura\n\nMe pergunte algo como: *"Qual campanha tem melhor ROAS?"*, *"O que devo pausar?"* ou *"Como posso escalar?"*`;
+      response = `Olá! Sou a **Vale Tec IA**, sua assistente de análise de campanhas. 🧭\n\nPosso te ajudar com:\n\n- 📊 **Análise de ROAS, CPA e métricas** das suas campanhas\n- 🎯 **Recomendações** de quais campanhas escalar ou pausar\n- 💡 **Insights sobre criativos** de melhor desempenho\n- 📋 **Relatórios resumidos** da operação\n- 🚀 **Estratégias de escala** segura\n\nMe pergunte algo como: *"Qual campanha tem melhor ROAS?"*, *"O que devo pausar?"* ou *"Como posso escalar?"*`;
     }
 
     return { response };
@@ -546,7 +546,7 @@ export async function getMockData(endpoint: string, _options?: any): Promise<any
   if (path === "/gemini/daily-report") {
     return {
       spend_today: 1580,
-      response: `## 🌅 Relatório Diário — Log Pose AI\n\n**Bom dia!** Aqui está o resumo de hoje:\n\n### 💰 Financeiro\n- **Faturamento:** R$ 4.890\n- **Gasto:** R$ 1.580\n- **Lucro estimado:** R$ 3.310\n- **ROAS do dia:** 3,09x\n\n### 🏆 Destaques\n1. **Mentoria Premium** — melhor ROAS do dia (4,1x) ✅\n2. **Lançamento VIP** — CPA de R$ 41 (abaixo da meta) ✅\n3. **Curso Marketing** — ROAS em queda (2,7x) ⚠️\n\n### 📌 Ações Recomendadas\n- Aumentar orçamento da **Mentoria Premium** em 20%\n- Revisar criativos do **Curso Marketing Digital**\n- Pausar conjunto "Broad 18-55" (ROAS 2,07x)\n\n> Quer que eu execute alguma dessas ações?`,
+      response: `## 🌅 Relatório Diário — Vale Tec IA\n\n**Bom dia!** Aqui está o resumo de hoje:\n\n### 💰 Financeiro\n- **Faturamento:** R$ 4.890\n- **Gasto:** R$ 1.580\n- **Lucro estimado:** R$ 3.310\n- **ROAS do dia:** 3,09x\n\n### 🏆 Destaques\n1. **Mentoria Premium** — melhor ROAS do dia (4,1x) ✅\n2. **Lançamento VIP** — CPA de R$ 41 (abaixo da meta) ✅\n3. **Curso Marketing** — ROAS em queda (2,7x) ⚠️\n\n### 📌 Ações Recomendadas\n- Aumentar orçamento da **Mentoria Premium** em 20%\n- Revisar criativos do **Curso Marketing Digital**\n- Pausar conjunto "Broad 18-55" (ROAS 2,07x)\n\n> Quer que eu execute alguma dessas ações?`,
     };
   }
 
