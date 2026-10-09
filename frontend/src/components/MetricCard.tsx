@@ -28,7 +28,7 @@ export function MetricCard({ label, value, rawValue, icon: Icon, color = "text-f
   const isLongValue = displayValue.length > 12;
 
   return (
-    <Card className="border-border/40 hover:border-border/70 transition-colors overflow-hidden">
+    <Card className="border-border hover:border-border/70 transition-colors overflow-hidden">
       <CardContent className="p-3 sm:p-4 flex items-center gap-2 sm:gap-3">
         <div className="flex size-7 sm:size-9 shrink-0 items-center justify-center rounded-lg bg-muted/60">
           <Icon className={cn("size-4", color)} />

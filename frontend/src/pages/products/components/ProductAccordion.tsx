@@ -37,7 +37,7 @@ export function ProductAccordion({ product, onAddItem, onEditProduct, onDeletePr
   const platforms = [...new Set(product.checkouts.map((c) => c.platform))];
 
   return (
-    <Card className="group/card border-border/40 overflow-hidden hover:border-border/60 transition-colors">
+    <Card className="group/card border-border overflow-hidden hover:border-border/60 transition-colors">
       <Accordion type="single" collapsible>
         <AccordionItem value={String(product.id)} className="border-none">
           <AccordionTrigger className="px-5 py-4 hover:no-underline hover:bg-muted/20 transition-colors">

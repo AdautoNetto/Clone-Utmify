@@ -52,7 +52,7 @@ interface HourlySalesChartProps {
 
 export function HourlySalesChart({ data }: HourlySalesChartProps) {
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Vendas por Hora</CardTitle>
         <CardDescription>Horários de pico de vendas no período</CardDescription>

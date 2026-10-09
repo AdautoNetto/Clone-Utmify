@@ -34,7 +34,7 @@ interface CustomersTableProps {
 export function CustomersTable({ data, loading, total, page, onPageChange, onViewCustomer }: CustomersTableProps) {
 
   return (
-    <Card className="border-border/40 premium-table">
+    <Card className="border-border premium-table">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>

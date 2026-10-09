@@ -32,7 +32,7 @@ export function RecoveryFunnelStats({ funnels }: RecoveryFunnelStatsProps) {
   };
 
   return (
-    <Card className="border-border/40 premium-table">
+    <Card className="border-border premium-table">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">
           Recuperação por Produto

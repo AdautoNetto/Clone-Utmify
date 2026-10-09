@@ -7,6 +7,7 @@ import { MobileAIChat } from "./MobileAIChat";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ValeMark } from "@/components/brand/ValeLogo";
 import { getStoredUser } from "@/services/auth";
+import { IS_DEMO } from "@/services/demoInterceptor";
 
 function initialsOf(name?: string) {
   const parts = (name || "").trim().split(/\s+/).filter(Boolean);
@@ -21,7 +22,14 @@ function MobileHeader() {
     <header className="bg-[var(--vt-navy)] text-white rounded-b-[28px] px-4 pt-[calc(12px+env(safe-area-inset-top))] pb-4">
       <div className="flex items-center gap-2.5 min-h-11">
         <ValeMark className="size-9" />
-        <p className="flex-1 font-num text-[16px] font-bold tracking-tight">Vale Tec</p>
+        <p className="flex-1 min-w-0 flex items-center gap-2 font-num text-[16px] font-bold tracking-tight">
+          Vale Tec
+          {IS_DEMO && (
+            <span className="rounded-full bg-[var(--vt-yellow)] px-2 py-0.5 font-sans text-[11px] font-bold tracking-normal text-[#0B3456]">
+              Demonstração
+            </span>
+          )}
+        </p>
         <button
           type="button"
           onClick={() => navigate("/profile")}

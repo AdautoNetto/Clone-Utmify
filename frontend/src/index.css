@@ -31,13 +31,13 @@
     --vt-teal: #0E9B84;
     --vt-on-navy: #FFFFFF;
     --vt-on-navy-soft: #A9C4E0;
-    --vt-shadow-card: 0 1px 2px rgba(8,42,77,.04), 0 10px 24px -8px rgba(8,42,77,.10);
+    --vt-shadow-card: 0 1px 2px rgba(8,42,77,.08), 0 6px 18px -6px rgba(8,42,77,.16);
     --vt-shadow-pop: 0 24px 60px -12px rgba(8,36,59,.35);
     --vt-ease-out: cubic-bezier(.16,1,.3,1);
     --vt-tabbar-h: 64px;
 
     --radius: 0.8rem;   /* xl ≈ 18px (cartão do SaaS), lg ≈ 13px (campo/botão) */
-    --background: #EEF4F9;
+    --background: #E2EBF3;   /* era #EEF4F9: cartão branco quase sumia no fundo */
     --foreground: #102637;
     --card: #FFFFFF;
     --card-foreground: #102637;
@@ -48,12 +48,12 @@
     --secondary: #E7F1F8;
     --secondary-foreground: #0B3456;
     --muted: #F6F9FB;
-    --muted-foreground: #546E83;
+    --muted-foreground: #4A6377;   /* ≥4.5:1 também sobre o fundo novo */
     --accent: #E7F1F8;
     --accent-foreground: #125891;
     --destructive: #C9453D;
-    --border: #D3DFE9;
-    --input: #D3DFE9;
+    --border: #C9D7E4;
+    --input: #C9D7E4;
     --ring: #3898E6;
     /* gráficos: azul da marca, amarelo de gráfico, teal, marinho, azul claro */
     --chart-1: #1977C4;
@@ -78,11 +78,11 @@
     --vt-shadow-card: 0 1px 2px rgba(0,0,0,.35), 0 10px 24px -12px rgba(0,0,0,.6);
     --vt-shadow-pop: 0 24px 60px -12px rgba(0,0,0,.75);
 
-    --background: #0B1722;
+    --background: #08121B;
     --foreground: #E7EEF4;
-    --card: #12212E;
+    --card: #14283A;
     --card-foreground: #E7EEF4;
-    --popover: #12212E;
+    --popover: #14283A;
     --popover-foreground: #E7EEF4;
     --primary: #3898E6;
     --primary-foreground: #FFFFFF;
@@ -93,8 +93,8 @@
     --accent: #123150;
     --accent-foreground: #A8D4FA;
     --destructive: #FF968D;
-    --border: #2A3E50;
-    --input: #2A3E50;
+    --border: #33506A;
+    --input: #33506A;
     --ring: #3898E6;
     --chart-1: #3898E6;
     --chart-2: #D6A21A;

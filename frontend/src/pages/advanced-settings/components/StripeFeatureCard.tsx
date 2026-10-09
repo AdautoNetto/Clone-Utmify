@@ -27,7 +27,7 @@ export function StripeFeatureCard() {
   };
 
   return (
-    <Card className="border-border/50">
+    <Card className="border-border">
       <CardHeader className="pb-4">
         <div className="flex items-center gap-3">
           <div className="rounded-lg bg-violet-500/10 p-2">

@@ -37,7 +37,7 @@ export function ConversionTable({ campaigns, conversionData }: ConversionTablePr
   const ttlLossRate = totals.total > 0 ? (ttlLost / totals.total) * 100 : 0;
 
   return (
-    <Card className="border-border/40 premium-table">
+    <Card className="border-border premium-table">
       <CardContent className="p-0">
         <div className="flex items-center px-4 py-2.5 border-b border-border/40">
           <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">

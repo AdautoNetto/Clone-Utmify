@@ -8,7 +8,7 @@ interface TopReasonsCardProps {
 export function TopReasonsCard({ data }: TopReasonsCardProps) {
   if (data.length === 0) {
     return (
-      <Card className="border-border/40 border-dashed">
+      <Card className="border-border border-dashed">
         <CardContent className="flex items-center justify-center py-10">
           <p className="text-sm text-muted-foreground">
             Nenhum motivo registrado ainda. Clique no ícone de edição na tabela para adicionar.
@@ -21,7 +21,7 @@ export function TopReasonsCard({ data }: TopReasonsCardProps) {
   const maxCount = Math.max(...data.map((d) => d.count), 1);
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-3">
         <CardTitle className="text-sm font-semibold">Principais Motivos</CardTitle>
       </CardHeader>

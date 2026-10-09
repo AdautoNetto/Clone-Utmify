@@ -82,7 +82,7 @@ export function MrrMovementChart({ data }: MrrMovementChartProps) {
 
   if (data.length === 0) {
     return (
-      <Card className="border-border/40">
+      <Card className="border-border">
         <CardContent className="flex items-center justify-center h-[340px] text-muted-foreground">
           Sem dados de movimentação
         </CardContent>
@@ -91,7 +91,7 @@ export function MrrMovementChart({ data }: MrrMovementChartProps) {
   }
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Movimento do MRR</CardTitle>
         <CardDescription>

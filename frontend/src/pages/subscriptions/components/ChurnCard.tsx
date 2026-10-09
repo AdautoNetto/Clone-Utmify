@@ -19,7 +19,7 @@ export function ChurnCard({
   const isHealthy = churnRate <= 5;
 
   return (
-    <Card className="border-border/40 transition-all duration-300 hover:shadow-lg hover:border-primary/20">
+    <Card className="border-border transition-all duration-300 hover:shadow-lg hover:border-primary/20">
       <CardHeader className="pb-3">
         <div className="flex items-center gap-2.5">
           <div className="rounded-lg bg-rose-500/10 p-2">

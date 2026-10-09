@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { geminiDailyReport } from "@/services/integrations";
 import { getReportIntervalMs } from "./ReportIntervalSettings";
+import { IS_DEMO } from "@/services/demoInterceptor";
 
 const REPORT_TIMESTAMP_KEY = "logpose-daily-report-ts";
 const REPORT_CACHE_KEY = "logpose-daily-report-cache";
@@ -29,7 +30,8 @@ export function useDailyReport(isConfigured: boolean) {
   const hasTriggered = useRef(false);
 
   useEffect(() => {
-    if (!isConfigured || hasTriggered.current) return;
+    // Na demonstração pública o relatório abria sozinho por cima das métricas
+    if (!isConfigured || hasTriggered.current || IS_DEMO) return;
 
     // Verificar horário mínimo (08:00)
     const now = new Date();

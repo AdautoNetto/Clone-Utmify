@@ -34,7 +34,7 @@ export function ProfileForm() {
   };
 
   return (
-    <Card className="border-border/50">
+    <Card className="border-border">
       <CardHeader className="pb-4">
         <CardTitle className="text-base">Informações Pessoais</CardTitle>
       </CardHeader>

@@ -14,7 +14,7 @@ interface TopCampaignsProps {
 export function TopCampaigns({ data }: TopCampaignsProps) {
   if (data.length === 0) {
     return (
-      <Card className="border-border/40">
+      <Card className="border-border">
         <CardContent className="flex items-center justify-center h-[200px] text-muted-foreground">
           Sem campanhas no período
         </CardContent>
@@ -23,7 +23,7 @@ export function TopCampaigns({ data }: TopCampaignsProps) {
   }
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Top Campanhas</CardTitle>
       </CardHeader>

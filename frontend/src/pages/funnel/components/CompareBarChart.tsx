@@ -25,7 +25,7 @@ export function CompareBarChart({ funnels, anchor }: CompareBarChartProps) {
 
   if (funnels.length === 0) {
     return (
-      <Card className="border-border/40 border-dashed">
+      <Card className="border-border border-dashed">
         <CardContent className="flex items-center justify-center py-16">
           <p className="text-sm text-muted-foreground">
             Selecione produtos para comparar
@@ -36,7 +36,7 @@ export function CompareBarChart({ funnels, anchor }: CompareBarChartProps) {
   }
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-3 pt-4 px-5">
         <CardTitle className="text-base">Comparativo por Etapa</CardTitle>
       </CardHeader>

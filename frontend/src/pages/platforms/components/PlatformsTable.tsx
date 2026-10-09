@@ -18,7 +18,7 @@ interface PlatformsTableProps {
 
 function TableSkeleton() {
   return (
-    <Card className="border-border/40 premium-table">
+    <Card className="border-border premium-table">
       <CardContent className="p-0">
         <div className="p-4 space-y-3">
           {[1, 2, 3].map((i) => (
@@ -48,7 +48,7 @@ export function PlatformsTable({ endpoints, isLoading, onDelete }: PlatformsTabl
 
   if (endpoints.length === 0) {
     return (
-      <Card className="border-border/40 border-dashed">
+      <Card className="border-border border-dashed">
         <CardContent className="flex flex-col items-center justify-center py-16 text-center">
           <p className="text-sm text-muted-foreground">
             Nenhum endpoint criado. Clique em "Novo Endpoint" para começar.
@@ -67,7 +67,7 @@ export function PlatformsTable({ endpoints, isLoading, onDelete }: PlatformsTabl
   };
 
   return (
-    <Card className="border-border/40 premium-table">
+    <Card className="border-border premium-table">
       <CardContent className="p-0">
         <div className="overflow-x-auto">
           <Table>

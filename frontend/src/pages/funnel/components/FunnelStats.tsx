@@ -32,7 +32,7 @@ export function FunnelStats({ funnels }: FunnelStatsProps) {
   };
 
   return (
-    <Card className="border-border/40 premium-table">
+    <Card className="border-border premium-table">
       <CardHeader className="pb-3">
         <CardTitle className="text-base">Comparativo de Etapas por Produto</CardTitle>
       </CardHeader>

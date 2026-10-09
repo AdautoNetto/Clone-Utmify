@@ -9,7 +9,7 @@ interface TaxSettingsProps {
 
 export function TaxSettings({ taxRate, onTaxChange }: TaxSettingsProps) {
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-base flex items-center gap-2">
           <RiPercentLine className="size-4 text-primary" />

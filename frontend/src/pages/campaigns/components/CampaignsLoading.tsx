@@ -3,7 +3,7 @@ import { cn } from "@/lib/utils";
 
 export function CampaignsLoading() {
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardContent className="p-6">
         <div className="flex flex-col items-center justify-center gap-3 py-12">
           <div className="flex gap-1">

@@ -84,7 +84,7 @@ export function MonthlyChart({ data, settings }: MonthlyChartProps) {
   }));
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div>

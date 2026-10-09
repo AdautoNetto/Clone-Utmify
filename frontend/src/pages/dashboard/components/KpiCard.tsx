@@ -48,22 +48,30 @@ export function KpiCard({
   const isLongValue = displayValue.length > 12;
 
   return (
-    <Card className="group relative overflow-hidden border-border/40 transition-all duration-300 hover:shadow-lg hover:border-primary/20">
-      <CardContent className="p-3 sm:p-5">
-        <div className="flex items-start justify-between gap-2">
-          <div className="min-w-0 flex-1 space-y-1.5">
-            <p className="text-[10px] sm:text-xs font-medium uppercase tracking-wider text-muted-foreground line-clamp-2 break-words">
-              {title}
-            </p>
+    <Card className="group relative overflow-hidden border-border transition-all duration-300 hover:shadow-lg hover:border-primary/20">
+      {/* Layout do cartão de métrica do SaaS Vale Tec: ícone em cima, número grande
+          com a largura toda do cartão, nome da métrica embaixo.
+          @container: o número encolhe com a largura do cartão em vez de virar "R$ 127,5 ..." */}
+      <CardContent className="p-4 sm:p-5">
+        <div className="@container min-w-0 space-y-1">
+          <div className={cn("mb-3 flex size-10 items-center justify-center rounded-[11px]", iconBgStyles[variant])}>
+            <Icon className={cn("size-5", variantStyles[variant])} />
+          </div>
+          <div className="space-y-1">
             <p
               className={cn(
-                "font-bold tabular-nums truncate",
-                isLongValue ? "text-sm sm:text-base" : "text-lg sm:text-2xl",
+                "font-bold tabular-nums truncate leading-tight",
+                isLongValue
+                  ? "text-[clamp(1rem,11cqw,1.375rem)]"
+                  : "text-[clamp(1.125rem,15cqw,1.75rem)]",
                 variantStyles[variant],
               )}
               title={titleAttr}
             >
               {displayValue}
+            </p>
+            <p className="text-[13px] font-medium text-muted-foreground line-clamp-2 break-words">
+              {title}
             </p>
             {subtitle && (
               <p className="text-[11px] sm:text-xs text-muted-foreground line-clamp-2 break-words">{subtitle}</p>
@@ -81,9 +89,6 @@ export function KpiCard({
                 <span className="text-xs text-muted-foreground">vs período anterior</span>
               </div>
             )}
-          </div>
-          <div className={cn("rounded-lg p-1.5 sm:p-2.5 shrink-0", iconBgStyles[variant])}>
-            <Icon className={cn("size-4 sm:size-5", variantStyles[variant])} />
           </div>
         </div>
       </CardContent>

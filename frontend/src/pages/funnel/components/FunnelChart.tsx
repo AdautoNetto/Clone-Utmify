@@ -54,7 +54,7 @@ export function FunnelChart({ funnel, anchor }: FunnelChartProps) {
   );
 
   return (
-    <Card className="border-border/40 overflow-hidden">
+    <Card className="border-border overflow-hidden">
       <CardContent className="p-0">
         <div className="overflow-x-auto w-full">
           <div className="min-w-[900px] flex flex-col">

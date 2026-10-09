@@ -46,7 +46,7 @@ interface MrrEvolutionChartProps {
 export function MrrEvolutionChart({ data }: MrrEvolutionChartProps) {
   if (data.length === 0) {
     return (
-      <Card className="border-border/40">
+      <Card className="border-border">
         <CardContent className="flex items-center justify-center h-[340px] text-muted-foreground">
           Sem dados de histórico
         </CardContent>
@@ -55,7 +55,7 @@ export function MrrEvolutionChart({ data }: MrrEvolutionChartProps) {
   }
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Evolução do MRR</CardTitle>
         <CardDescription>

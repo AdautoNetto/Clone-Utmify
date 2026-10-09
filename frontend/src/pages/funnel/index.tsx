@@ -133,7 +133,7 @@ export default function FunnelPage() {
 
 function EmptyState() {
   return (
-    <Card className="border-border/40 border-dashed">
+    <Card className="border-border border-dashed">
       <CardContent className="flex items-center justify-center py-16">
         <p className="text-sm text-muted-foreground">
           Nenhum produto cadastrado. Cadastre produtos para ver o funil.

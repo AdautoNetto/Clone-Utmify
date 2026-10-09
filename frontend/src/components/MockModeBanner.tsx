@@ -6,7 +6,8 @@ import { IS_DEMO } from "@/services/demoInterceptor";
 export function MockModeBanner() {
   const { isMock, deactivateMock } = useMockMode();
 
-  if (!isMock && !IS_DEMO) return null;
+  // Na demonstração o aviso fica fixo no cabeçalho/logo (o flutuante cobria os números)
+  if (!isMock || IS_DEMO) return null;
 
   return createPortal(
     <div

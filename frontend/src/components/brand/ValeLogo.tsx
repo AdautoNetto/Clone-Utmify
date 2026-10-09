@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+import { IS_DEMO } from "@/services/demoInterceptor";
 
 /**
  * Marca Vale Tec — a mesma coroa do SaaS da academia (favicon / rail__brand).
@@ -30,7 +31,7 @@ export function ValeMark({
 /** Marca + nome. Em fundo marinho use onNavy (texto branco). */
 export function ValeLogo({
   onNavy = false,
-  subtitle = "Rastreio de vendas",
+  subtitle = IS_DEMO ? "Demonstração · dados de exemplo" : "Rastreio de vendas",
   className,
 }: {
   onNavy?: boolean;

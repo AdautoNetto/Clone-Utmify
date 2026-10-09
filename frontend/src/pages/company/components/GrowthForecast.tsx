@@ -47,7 +47,7 @@ export function GrowthForecast({ data, settings }: GrowthForecastProps) {
   ];
 
   return (
-    <Card className="border-border/40">
+    <Card className="border-border">
       <CardHeader className="pb-2">
         <CardTitle className="text-base">Previsão de Crescimento</CardTitle>
         <CardDescription>Projeções baseadas na performance atual</CardDescription>

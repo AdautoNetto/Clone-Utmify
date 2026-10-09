@@ -117,7 +117,7 @@ export function CampaignsTable({
 
   return (
     <>
-      <Card className="border-border/40 premium-table overflow-hidden min-w-0">
+      <Card className="border-border premium-table overflow-hidden min-w-0">
         <CardContent className="p-0">
           <div className="overflow-x-auto">
             <Table>
