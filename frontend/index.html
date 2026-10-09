@@ -28,6 +28,15 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="Vale Tec" />
       <link rel="preload" href="/fonts/plus-jakarta-sans-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Tema antes do 1º quadro (sem piscar branco): auto segue o aparelho; ver src/lib/theme.ts -->
+    <script>
+      (function () {
+        var p = "auto";
+        try { p = localStorage.getItem("theme") || "auto"; } catch (e) {}
+        var escuro = p === "dark" || (p === "auto" && window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches);
+        if (escuro) document.documentElement.classList.add("dark");
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

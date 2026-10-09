@@ -1,6 +1,5 @@
-import { RiLogoutBoxLine, RiExpandUpDownLine, RiSunLine, RiMoonLine, RiUserLine, RiSettings3Line, RiMoneyDollarCircleLine } from "@remixicon/react";
+import { RiLogoutBoxLine, RiExpandUpDownLine, RiUserLine, RiSettings3Line, RiMoneyDollarCircleLine } from "@remixicon/react";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
 import { Switch } from "@/components/ui/switch";
 import { useValueDisplay } from "@/contexts/ValueDisplayContext";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -19,25 +18,14 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { logout, getStoredUser } from "@/services/auth";
+import { ThemeSwitch } from "@/components/ThemeSwitch";
 
 export function SidebarUser() {
   const { isMobile } = useSidebar();
   const navigate = useNavigate();
   const user = getStoredUser();
 
-  const [isDark, setIsDark] = useState(() => localStorage.getItem("theme") === "dark");
   const { showFull, toggle: toggleFull } = useValueDisplay();
-
-  useEffect(() => {
-    const root = document.documentElement;
-    if (isDark) {
-      root.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      root.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [isDark]);
 
   const initials = user?.name
     ?.split(" ")
@@ -112,10 +100,9 @@ export function SidebarUser() {
               <RiUserLine className="size-4" />
               Perfil
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => setIsDark(!isDark)}>
-              {isDark ? <RiSunLine className="size-4" /> : <RiMoonLine className="size-4" />}
-              {isDark ? "Modo Claro" : "Modo Escuro"}
-            </DropdownMenuItem>
+            {/* Aparência: Automático (segue o aparelho) / Claro / Escuro — o mesmo controle do celular */}
+            <DropdownMenuSeparator />
+            <ThemeSwitch className="py-1" />
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
               <RiLogoutBoxLine className="size-4" />

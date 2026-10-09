@@ -2,6 +2,7 @@ import type { RemixiconComponentType } from "@remixicon/react";
 import { RiMoneyDollarCircleLine, RiLogoutBoxLine } from "@remixicon/react";
 import { Switch } from "@/components/ui/switch";
 import { useValueDisplay } from "@/contexts/ValueDisplayContext";
+import { ThemeSwitch } from "@/components/ThemeSwitch";
 
 export interface MoreItem {
   group: string;
@@ -69,6 +70,10 @@ export function MoreDropdown({
             </div>
           );
         })}
+
+        <div className="my-1 border-t border-border/30" />
+
+        <ThemeSwitch className="pb-2 pt-1" />
 
         <div className="my-1 border-t border-border/30" />
 
