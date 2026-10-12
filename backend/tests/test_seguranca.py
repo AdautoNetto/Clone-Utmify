@@ -104,8 +104,10 @@ def test_senha_nova_pelo_link_derruba_quem_estava_logado():
 # ── Cabeçalhos, documentação e CORS ────────────────────────────────────────
 
 def test_cabecalhos_de_seguranca_em_toda_resposta(conta):
+    # "/" e "/login" são a página do painel (ou 404 sem o painel montado): também têm que vir protegidas
     for r in (client.get("/api/health"), client.get("/api/sales/transactions"),
-              client.get("/api/sales/transactions", headers=conta["auth"])):
+              client.get("/api/sales/transactions", headers=conta["auth"]),
+              client.get("/"), client.get("/login")):
         h = r.headers
         assert h["x-content-type-options"] == "nosniff"
         assert h["x-frame-options"] == "DENY"

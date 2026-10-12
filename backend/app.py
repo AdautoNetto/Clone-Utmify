@@ -209,7 +209,6 @@ app.include_router(reset_sales_router, prefix="/api")
 
 # SPA Middleware (serves frontend in production)
 _frontend_dir = os.path.join(os.path.dirname(__file__), "frontend_dist")
-app.add_middleware(SecurityHeadersMiddleware, frontend_dir=_frontend_dir)
 
 if os.path.isdir(_frontend_dir):
     class SPAMiddleware(BaseHTTPMiddleware):
@@ -237,3 +236,7 @@ if os.path.isdir(_frontend_dir):
     _assets_dir = os.path.join(_frontend_dir, "assets")
     if os.path.isdir(_assets_dir):
         app.mount("/assets", StaticFiles(directory=_assets_dir), name="frontend-assets")
+
+# Por último = camada mais de fora: os cabeçalhos de segurança valem para TUDO,
+# inclusive a página do painel servida pelo SPAMiddleware acima.
+app.add_middleware(SecurityHeadersMiddleware, frontend_dir=_frontend_dir)

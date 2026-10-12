@@ -7,6 +7,7 @@
 #     VERCEL="vercel" ESCOPO=sua-equipe sh deploy/publicar-vercel.sh
 #
 # PASTA_VERCEL é a pasta ligada ao projeto da Vercel (tem a subpasta .vercel).
+# Sem o comando "vercel" no PATH, use VERCEL_JS="C:/caminho/para/vercel/dist/vc.js".
 set -eu
 
 : "${SERVIDOR_URL:?defina SERVIDOR_URL=https://endereco-do-servidor}"
@@ -27,5 +28,13 @@ rm -rf "$TMP"
 
 echo "== 3/3 Publicando"
 cd "$PASTA_VERCEL"
-# shellcheck disable=SC2086
-$VERCEL deploy --prod --yes ${ESCOPO:+--scope "$ESCOPO"}
+# VERCEL_JS: caminho do vc.js quando o comando "vercel" não está no PATH
+# (função, e não variável, para o caminho poder ter espaço)
+vercel_cli() {
+  if [ -n "${VERCEL_JS:-}" ]; then node "$VERCEL_JS" "$@"; else "$VERCEL" "$@"; fi
+}
+if [ -n "${ESCOPO:-}" ]; then
+  vercel_cli deploy --prod --yes --scope "$ESCOPO"
+else
+  vercel_cli deploy --prod --yes
+fi
