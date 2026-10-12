@@ -6,6 +6,7 @@ from datetime import datetime
 from database.core.connection import get_db
 from database.models.gemini_account import GeminiAccount
 from api.auth.deps import get_current_user
+from api.masking import mask_secret
 
 router = APIRouter(prefix="/gemini", tags=["gemini"])
 
@@ -31,12 +32,19 @@ class GeminiAccountResponse(BaseModel):
         from_attributes = True
 
 
+def _public(account) -> GeminiAccountResponse:
+    """Para a tela vai só o final da chave; a chave inteira fica no servidor."""
+    data = GeminiAccountResponse.model_validate(account)
+    data.api_key = mask_secret(data.api_key)
+    return data
+
+
 @router.get("/accounts", response_model=list[GeminiAccountResponse])
 def list_accounts(
     db: Session = Depends(get_db),
     _=Depends(get_current_user),
 ):
-    return db.query(GeminiAccount).order_by(GeminiAccount.id.desc()).all()
+    return [_public(a) for a in db.query(GeminiAccount).order_by(GeminiAccount.id.desc()).all()]
 
 
 @router.post("/accounts", response_model=GeminiAccountResponse, status_code=201)
@@ -53,7 +61,7 @@ def create_account(
     db.add(account)
     db.commit()
     db.refresh(account)
-    return account
+    return _public(account)
 
 
 @router.patch("/accounts/{account_id}", response_model=GeminiAccountResponse)
@@ -69,7 +77,7 @@ def update_account_model(
     account.model = payload.model
     db.commit()
     db.refresh(account)
-    return account
+    return _public(account)
 
 
 @router.delete("/accounts/{account_id}", status_code=204)

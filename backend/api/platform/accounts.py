@@ -73,11 +73,14 @@ def list_accounts(
     for account in accounts:
         members = [u for u in users if u.account_id == account.id]
         owner = next((u for u in members if u.role == UserRole.owner and u.email), None)
-        sales, last_sale = 0, None
+        sales, last_sale, revenue = 0, None, 0.0
         schema = schema_for(account.id)
         if schema in schemas:
-            sales, last_sale = db.execute(text(
-                f'SELECT count(*), max(created_at) FROM "{schema}".transactions'
+            # Faturamento = vendas aprovadas (reembolsos e pendentes não entram)
+            sales, last_sale, revenue = db.execute(text(
+                f'SELECT count(*), max(created_at), '
+                f"coalesce(sum(amount) FILTER (WHERE status = 'APPROVED'), 0) "
+                f'FROM "{schema}".transactions'
             )).one()
         result.append({
             "id": account.id,
@@ -85,6 +88,7 @@ def list_accounts(
             "owner_email": owner.email if owner else None,
             "users": len([u for u in members if u.email]),
             "sales": sales,
+            "revenue": round(float(revenue), 2),
             "last_sale_at": last_sale.isoformat() if last_sale else None,
             "created_at": account.created_at.isoformat() if account.created_at else None,
             "blocked": bool(account.blocked),

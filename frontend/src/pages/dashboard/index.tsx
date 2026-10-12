@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DashboardHeader } from "./components/DashboardHeader";
 import { KpiGrid } from "./components/KpiGrid";
+import { OnboardingCard } from "./components/OnboardingCard";
 import { RevenueChart } from "./components/RevenueChart";
 import { PlatformChart } from "./components/PlatformChart";
 import { TopCampaigns } from "./components/TopCampaigns";
@@ -47,6 +48,7 @@ export default function DashboardPage() {
   return (
     <div className="flex flex-col gap-6 p-6">
       <DashboardHeader onRefresh={reload} />
+      <OnboardingCard />
       <GlobalFilterBar
         filters={filters}
         onFiltersChange={setFilters}

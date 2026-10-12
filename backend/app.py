@@ -74,6 +74,8 @@ from database.core.bootstrap import bootstrap_database
 from database.core.connection import wait_for_database
 from database.core.tenancy import set_current_account, reset_current_account
 from api.auth.token import verify_token
+from api.security_headers import SecurityHeadersMiddleware
+from api.onboarding import router as onboarding_router
 
 # O container do app pode subir antes do Postgres aceitar conexões
 wait_for_database()
@@ -82,7 +84,14 @@ wait_for_database()
 # compartimento. Instalação antiga de conta única é convertida aqui, sem perder dado.
 bootstrap_database()
 
-app = FastAPI(title="ConvergeAI API")
+# A documentação automática (/docs) mostra todas as rotas: só liga com API_DOCS=1 (uso local)
+_docs = os.getenv("API_DOCS", "0") == "1"
+app = FastAPI(
+    title="Vale Tec · Rastreio de vendas",
+    docs_url="/docs" if _docs else None,
+    redoc_url=None,
+    openapi_url="/openapi.json" if _docs else None,
+)
 
 
 @app.get("/api/health", include_in_schema=False)
@@ -129,11 +138,12 @@ class TenantMiddleware:
 
 app.add_middleware(TenantMiddleware)
 
-# CORS for development
+# CORS: o login vai no cabeçalho Authorization (não em cookie), então outros sites
+# não ganham nada com o navegador da pessoa. Sem credenciais de propósito.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -141,6 +151,7 @@ app.add_middleware(
 # API routes
 app.include_router(setup_router, prefix="/api")
 app.include_router(login_router, prefix="/api")
+app.include_router(onboarding_router, prefix="/api")
 app.include_router(password_reset_router, prefix="/api")
 app.include_router(platform_accounts_router, prefix="/api")
 app.include_router(company_router, prefix="/api")
@@ -198,6 +209,7 @@ app.include_router(reset_sales_router, prefix="/api")
 
 # SPA Middleware (serves frontend in production)
 _frontend_dir = os.path.join(os.path.dirname(__file__), "frontend_dist")
+app.add_middleware(SecurityHeadersMiddleware, frontend_dir=_frontend_dir)
 
 if os.path.isdir(_frontend_dir):
     class SPAMiddleware(BaseHTTPMiddleware):

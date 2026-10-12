@@ -47,7 +47,7 @@ def get_current_user(
     if not payload:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Sessão expirada. Faça login de novo.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -55,7 +55,7 @@ def get_current_user(
     if admin_id is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Could not validate credentials",
+            detail="Sessão expirada. Faça login de novo.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -63,13 +63,21 @@ def get_current_user(
     if admin is None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User not found",
+            detail="Sessão expirada. Faça login de novo.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
     # O login só vale para a conta em que foi emitido (é o "acc" do token que
     # aponta o banco para os dados daquela conta — ver TenantMiddleware).
     if admin.account_id is None or payload.get("acc") != admin.account_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sessão expirada. Faça login de novo.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Login feito antes da última troca de senha não vale mais
+    if (payload.get("ver") or 0) != (admin.token_version or 0):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Sessão expirada. Faça login de novo.",

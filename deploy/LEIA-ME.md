@@ -114,14 +114,30 @@ do servidor e rode `sudo sh deploy/atualizar.sh`.
 A Vercel não roda este sistema sozinha (ele precisa de servidor ligado 24h e de banco). O que dá para
 fazer é publicar **só o painel** na Vercel e deixar que ela repasse tudo de `/api` para o servidor:
 
-1. No computador, na pasta `frontend`: `VITE_WEBHOOK_ORIGIN=https://ENDERECO-DO-SERVIDOR npx vite build --outDir <pasta>`
-   (com essa variável, o endereço de vendas mostrado em **Plataformas** aponta direto para o servidor:
-   a venda não passa pela Vercel).
-2. Na pasta gerada, um `vercel.json` com dois repasses: `/api/:path*` → `https://ENDERECO-DO-SERVIDOR/api/:path*`
-   e o resto → `/index.html`.
-3. `vercel deploy --prod` nessa pasta. A cada mudança no painel, repetir os passos 1 e 3.
+1. Uma vez: crie uma pasta fora do projeto, rode `vercel link` nela (cria a subpasta `.vercel`).
+2. A cada mudança no painel, no Git Bash, na pasta do projeto:
+   `SERVIDOR_URL=https://ENDERECO-DO-SERVIDOR PASTA_VERCEL="/c/caminho/da/pasta" sh deploy/publicar-vercel.sh`
+   O script monta o painel (o endereço de vendas mostrado em **Plataformas** aponta direto para o
+   servidor: a venda não passa pela Vercel), gera o `vercel.json` (repasse de `/api` e cabeçalhos de
+   segurança) e publica.
 
-Os dados continuam no servidor; se o endereço do servidor mudar, refaça os passos 1 a 3.
+Os dados continuam no servidor; se o endereço do servidor mudar, rode o passo 2 de novo.
+
+## Segurança (o que já vem ligado)
+
+- **Chaves de integração** (Facebook, Gemini, Stripe, VTurb) ficam no servidor; a tela recebe só o
+  final delas. Quem é só visualização nunca recebe token nenhum.
+- **Senha:** trocar a senha pede a senha atual e derruba os logins feitos antes (em qualquer aparelho).
+  O mesmo vale para senha criada pelo link de "Esqueci minha senha".
+- **Cabeçalhos de proteção** em toda resposta (política de conteúdo, anti-moldura, HTTPS obrigatório):
+  só o código do próprio painel roda no navegador.
+- **Lista de rotas (`/docs`) fechada.** Para abrir em uso local: `API_DOCS=1`.
+- **Limites:** cadastro, login, pedido de senha e tamanho das vendas recebidas.
+- **Bibliotecas:** `pip-audit -r backend/requirements.txt` sem falha conhecida (12/10/2026). No painel,
+  `npm audit` ainda aponta 7 avisos, todos da ferramenta de linha de comando `shadcn` (usada só para
+  gerar componentes; não vai para o navegador). Rever quando sair versão nova dela.
+- **Ainda não tem:** assinatura das vendas recebidas (quem souber o endereço de vendas de uma conta
+  consegue mandar uma venda falsa para ela; o endereço é um código secreto de 12 caracteres).
 
 ## Backups
 

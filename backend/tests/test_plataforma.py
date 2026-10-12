@@ -47,6 +47,16 @@ def test_so_a_primeira_conta_administra_o_sistema(contas):
     assert entrar("chefe@teste.com")  # nada mudou para a conta do chefe
 
 
+def test_faturamento_soma_so_as_vendas_aprovadas(contas):
+    chefe, amigo = contas
+    client.post(amigo["url"], json=venda("PED-1", amount=100.0))
+    client.post(amigo["url"], json=venda("PED-2", amount=50.0, status="pending"))
+    client.post(amigo["url"], json=venda("PED-3", amount=40.0, status="refunded"))
+    lista = _lista(chefe["auth"])
+    assert lista["amigo@teste.com"]["revenue"] == 100.0
+    assert lista["chefe@teste.com"]["revenue"] == 0.0
+
+
 def test_lista_mostra_as_contas_com_numero_de_vendas(contas):
     chefe, amigo = contas
     client.post(amigo["url"], json=venda("PED-1"))

@@ -138,6 +138,9 @@ def bootstrap_database() -> None:
         conn.exec_driver_sql(
             "ALTER TABLE public.accounts ADD COLUMN IF NOT EXISTS blocked BOOLEAN NOT NULL DEFAULT false"
         )
+        conn.exec_driver_sql(
+            "ALTER TABLE public.admins ADD COLUMN IF NOT EXISTS token_version INTEGER NOT NULL DEFAULT 0"
+        )
         legacy = _legacy_tables(conn)
         if legacy:
             _move_legacy_to_schema(conn, legacy)

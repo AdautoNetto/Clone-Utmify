@@ -28,4 +28,6 @@ class Admin(Base):
     invite_token = Column(String(255), unique=True, nullable=True)
     # Administra o SISTEMA (vê e remove contas). Não é o mesmo que ser dono de uma conta.
     is_platform_admin = Column(Boolean, nullable=False, default=False, server_default=text("false"))
+    # Sobe a cada troca de senha: logins feitos antes deixam de valer
+    token_version = Column(Integer, nullable=False, default=0, server_default=text("0"))
     created_at = Column(DateTime, server_default=CREATED_AT_DEFAULT)

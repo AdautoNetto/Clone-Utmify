@@ -129,6 +129,7 @@ def reset_password(token: str, data: ResetRequest, request: Request, db: Session
 
     admin = db.get(Admin, row.admin_id)
     admin.password_hash = hash_password(data.password)
+    admin.token_version = (admin.token_version or 0) + 1  # quem estava logado com a senha antiga cai
     row.used_at = datetime.now(timezone.utc)
     db.commit()
     return {"message": "Senha criada. Já pode entrar."}

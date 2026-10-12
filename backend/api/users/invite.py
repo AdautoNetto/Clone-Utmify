@@ -35,7 +35,7 @@ def create_invite(
     if data.role == "admin" and current_user.role != UserRole.owner:
         raise HTTPException(
             status_code=403,
-            detail="Apenas o owner pode criar administradores",
+            detail="Apenas o dono da conta pode criar administradores",
         )
 
     token = uuid.uuid4().hex

@@ -2,7 +2,7 @@ import os
 import logging
 import secrets
 from datetime import datetime, timedelta, timezone
-from jose import jwt
+import jwt  # PyJWT
 
 logger = logging.getLogger(__name__)
 

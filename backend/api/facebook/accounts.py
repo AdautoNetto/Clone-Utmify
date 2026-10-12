@@ -9,6 +9,8 @@ import os
 from database.core.connection import get_db
 from database.models.facebook_account import FacebookAccount
 from api.auth.deps import get_current_user
+from api.masking import mask_secret
+from database.models.admin import Admin, UserRole
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/facebook", tags=["facebook"])
@@ -40,9 +42,18 @@ class FacebookAccountResponse(BaseModel):
 @router.get("/accounts", response_model=list[FacebookAccountResponse])
 def list_accounts(
     db: Session = Depends(get_db),
-    _=Depends(get_current_user),
+    current_user: Admin = Depends(get_current_user),
 ):
-    return db.query(FacebookAccount).order_by(FacebookAccount.id.desc()).all()
+    accounts = db.query(FacebookAccount).order_by(FacebookAccount.id.desc()).all()
+    if current_user.role != UserRole.viewer:
+        return accounts
+    # Visualizador não mexe em integração: recebe só o final do token
+    result = []
+    for account in accounts:
+        data = FacebookAccountResponse.model_validate(account)
+        data.access_token = mask_secret(data.access_token)
+        result.append(data)
+    return result
 
 
 @router.post("/accounts", response_model=FacebookAccountResponse, status_code=201)

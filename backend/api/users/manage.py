@@ -63,6 +63,7 @@ def reset_user_password(
 
     check_new_password(data.new_password, data.confirm_password)
     user.password_hash = hash_password(data.new_password)
+    user.token_version = (user.token_version or 0) + 1  # derruba as sessões da senha antiga
     db.commit()
     return {"message": "Senha redefinida com sucesso"}
 

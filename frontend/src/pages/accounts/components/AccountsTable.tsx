@@ -21,12 +21,14 @@ interface AccountsTableProps {
   onDelete: (account: PlatformAccount) => void;
 }
 
+const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
 function formatDate(iso: string | null): string {
   if (!iso) return "—";
   return new Date(iso).toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric" });
 }
 
-const COLUMNS = 7;
+const COLUMNS = 8;
 
 export function AccountsTable({ data, loading, onBlock, onResetLink, onDelete }: AccountsTableProps) {
   return (
@@ -39,6 +41,7 @@ export function AccountsTable({ data, loading, onBlock, onResetLink, onDelete }:
                 <TableHead>Conta</TableHead>
                 <TableHead className="text-right tabular-nums">Usuários</TableHead>
                 <TableHead className="text-right tabular-nums">Vendas</TableHead>
+                <TableHead className="text-right tabular-nums">Faturamento</TableHead>
                 <TableHead className="tabular-nums">Última venda</TableHead>
                 <TableHead className="tabular-nums">Criada em</TableHead>
                 <TableHead>Situação</TableHead>
@@ -69,6 +72,7 @@ export function AccountsTable({ data, loading, onBlock, onResetLink, onDelete }:
                     </TableCell>
                     <TableCell className="text-right tabular-nums">{account.users}</TableCell>
                     <TableCell className="text-right tabular-nums">{account.sales}</TableCell>
+                    <TableCell className="text-right tabular-nums">{brl.format(account.revenue)}</TableCell>
                     <TableCell className="tabular-nums">{formatDate(account.last_sale_at)}</TableCell>
                     <TableCell className="tabular-nums">{formatDate(account.created_at)}</TableCell>
                     <TableCell>

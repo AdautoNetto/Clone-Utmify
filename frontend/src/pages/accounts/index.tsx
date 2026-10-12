@@ -10,6 +10,8 @@ import { DeleteAccountModal } from "./components/DeleteAccountModal";
 import { ResetLinkModal } from "./components/ResetLinkModal";
 import { EmailSettingsCard } from "./components/EmailSettingsCard";
 
+const brl = new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" });
+
 export default function AccountsPage() {
   const [accounts, setAccounts] = useState<PlatformAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -65,10 +67,26 @@ export default function AccountsPage() {
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Contas</h1>
           <p className="text-sm text-muted-foreground">
-            Todo mundo que se cadastrou no sistema. Só você vê esta tela.
+            Todo mundo que se cadastrou no sistema e quanto cada conta já vendeu. Só você vê esta tela.
           </p>
         </div>
       </div>
+
+      {!denied && !loading && (
+        <div className="grid gap-3 grid-cols-2 lg:grid-cols-4">
+          {[
+            { label: "Contas", value: String(accounts.length) },
+            { label: "Usuários", value: String(accounts.reduce((n, a) => n + a.users, 0)) },
+            { label: "Vendas recebidas", value: String(accounts.reduce((n, a) => n + a.sales, 0)) },
+            { label: "Faturamento somado", value: brl.format(accounts.reduce((n, a) => n + a.revenue, 0)) },
+          ].map((item) => (
+            <div key={item.label} className="rounded-[18px] border border-border bg-card p-4 shadow-[var(--vt-shadow-card)]">
+              <p className="font-num text-xl font-bold tabular-nums">{item.value}</p>
+              <p className="text-xs text-muted-foreground">{item.label}</p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {denied ? (
         <p className="rounded-[18px] border border-border bg-card p-6 text-sm text-muted-foreground" role="alert">

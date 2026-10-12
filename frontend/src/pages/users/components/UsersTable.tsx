@@ -18,7 +18,7 @@ interface UsersTableProps {
 }
 
 const roleLabels: Record<string, string> = {
-  owner: "Owner",
+  owner: "Dono",
   admin: "Administrador",
   viewer: "Visualizador",
 };

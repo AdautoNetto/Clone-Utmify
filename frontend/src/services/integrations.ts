@@ -184,7 +184,7 @@ export async function deleteGeminiAccount(id: number): Promise<void> {
 }
 
 export async function fetchGeminiModels(apiKey: string): Promise<GeminiModelAPI[]> {
-  return apiRequest<GeminiModelAPI[]>(`/gemini/models?api_key=${encodeURIComponent(apiKey)}`);
+  return apiRequest<GeminiModelAPI[]>("/gemini/models", { method: "POST", body: { api_key: apiKey } });
 }
 
 export async function geminiChatStatus(): Promise<{ configured: boolean; count: number }> {

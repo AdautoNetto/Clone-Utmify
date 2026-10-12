@@ -59,7 +59,7 @@ export function ChangeRoleModal({ user, onClose, onChangeRole }: ChangeRoleModal
             <p className="text-xs text-muted-foreground">
               {role === "viewer"
                 ? "Poderá apenas visualizar os dados do dashboard."
-                : "Terá acesso completo, exceto gerenciar o owner."}
+                : "Terá acesso completo, exceto gerenciar o dono da conta."}
             </p>
           </div>
           <DialogFooter>

@@ -2,7 +2,8 @@
 Endpoint para listar modelos disponíveis do Gemini.
 Usa httpx para chamar a API REST diretamente (sem SDK).
 """
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel
 import httpx
 
 from api.auth.deps import get_current_user
@@ -12,12 +13,17 @@ router = APIRouter(prefix="/gemini", tags=["gemini"])
 GEMINI_MODELS_URL = "https://generativelanguage.googleapis.com/v1beta/models"
 
 
-@router.get("/models")
+class GeminiModelsRequest(BaseModel):
+    api_key: str
+
+
+@router.post("/models")
 async def list_gemini_models(
-    api_key: str = Query(...),
+    payload: GeminiModelsRequest,
     _=Depends(get_current_user),
 ):
-    """Lista modelos disponíveis para a API Key fornecida."""
+    """Lista modelos disponíveis para a API Key fornecida (no corpo, nunca na URL)."""
+    api_key = payload.api_key
     try:
         async with httpx.AsyncClient(timeout=10) as client:
             resp = await client.get(GEMINI_MODELS_URL, params={"key": api_key})
@@ -38,4 +44,5 @@ async def list_gemini_models(
                 })
         return result
     except httpx.HTTPError as e:
-        raise HTTPException(status_code=400, detail=f"Erro de conexão: {str(e)}")
+        # Sem o texto do erro: ele pode trazer a URL com a chave
+        raise HTTPException(status_code=400, detail=f"Erro de conexão com o Google ({type(e).__name__})")

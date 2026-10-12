@@ -26,6 +26,16 @@ class LoginResponse(BaseModel):
     user: dict
 
 
+def issue_token(admin: Admin) -> str:
+    return create_access_token({
+        "sub": str(admin.id),
+        "acc": admin.account_id,  # conta: define quais dados o login enxerga
+        "ver": admin.token_version or 0,  # trocar a senha invalida os logins anteriores
+        "email": admin.email,
+        "role": admin.role.value,
+    })
+
+
 @router.post("/login", response_model=LoginResponse)
 def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
     email = data.email.strip().lower()
@@ -56,12 +66,7 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
         )
 
     login_failures.clear(key)
-    token = create_access_token({
-        "sub": str(admin.id),
-        "acc": admin.account_id,  # conta: define quais dados o login enxerga
-        "email": admin.email,
-        "role": admin.role.value,
-    })
+    token = issue_token(admin)
 
     return {
         "access_token": token,

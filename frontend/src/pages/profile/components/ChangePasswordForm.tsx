@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/services/api";
+import { setCookie } from "@/lib/cookies";
 
 export function ChangePasswordForm() {
   const [showNew, setShowNew] = useState(false);
@@ -12,6 +13,8 @@ export function ChangePasswordForm() {
 
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ text: "", type: "" });
 
@@ -27,15 +30,19 @@ export function ChangePasswordForm() {
     }
 
     try {
-      await apiRequest("/profile/password", {
+      const result = await apiRequest<{ access_token?: string }>("/profile/password", {
         method: "PUT",
-        body: { 
-          new_password: newPassword, 
-          confirm_password: confirmPassword 
+        body: {
+          current_password: currentPassword,
+          new_password: newPassword,
+          confirm_password: confirmPassword,
         },
       });
+      // A troca derruba os logins antigos; este navegador continua com o login novo
+      if (result.access_token) setCookie("access_token", result.access_token, 30);
       
       setMessage({ text: "Senha alterada com sucesso!", type: "success" });
+      setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (error: any) {
@@ -52,6 +59,16 @@ export function ChangePasswordForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleChangePassword} className="space-y-4">
+          <PasswordField
+            id="current-pw"
+            label="Senha Atual"
+            placeholder="A senha que você usa hoje"
+            value={currentPassword}
+            onChange={(e) => setCurrentPassword(e.target.value)}
+            show={showCurrent}
+            onToggle={() => setShowCurrent(!showCurrent)}
+            minLength={1}
+          />
           <PasswordField
             id="new-pw"
             label="Nova Senha"
@@ -87,9 +104,9 @@ export function ChangePasswordForm() {
 }
 
 function PasswordField({
-  id, label, placeholder, value, onChange, show, onToggle,
+  id, label, placeholder, value, onChange, show, onToggle, minLength = 8,
 }: {
-  id: string; label: string; placeholder: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; show: boolean; onToggle: () => void;
+  id: string; label: string; placeholder: string; value: string; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void; show: boolean; onToggle: () => void; minLength?: number;
 }) {
   return (
     <div className="space-y-2">
@@ -102,7 +119,7 @@ function PasswordField({
           onChange={onChange}
           placeholder={placeholder}
           required
-          minLength={8}
+          minLength={minLength}
         />
         <button
           type="button"

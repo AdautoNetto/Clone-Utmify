@@ -7,6 +7,7 @@ export interface PlatformAccount {
   owner_email: string | null;
   users: number;
   sales: number;
+  revenue: number;
   last_sale_at: string | null;
   created_at: string | null;
   blocked: boolean;
