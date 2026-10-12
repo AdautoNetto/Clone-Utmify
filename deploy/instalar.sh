@@ -33,8 +33,12 @@ fi
 chmod 600 .env
 mkdir -p /opt/logpose/backups
 
-echo "== Subindo (primeira vez demora uns 5 minutos para montar)"
-docker compose -f docker-compose.vps.yml -f docker-compose.caddy.yml up -d --build
+# Servidor pequeno: se o painel já veio montado em ./frontend_dist, não monta aqui
+ARQS="-f docker-compose.vps.yml -f docker-compose.caddy.yml"
+[ -f frontend_dist/index.html ] && ARQS="$ARQS -f docker-compose.prebuilt.yml"
+
+echo "== Subindo (primeira vez demora de 5 a 15 minutos para montar)"
+docker compose $ARQS up -d --build
 
 echo "== Esperando o app responder"
 i=0
@@ -44,7 +48,7 @@ until docker compose -f docker-compose.vps.yml exec -T app python -c "import url
   sleep 5
 done
 
-docker compose -f docker-compose.vps.yml -f docker-compose.caddy.yml ps
+docker compose $ARQS ps
 echo
 echo "OK. Abra https://$DOMINIO e crie o usuário dono."
 echo "Backups diários em /opt/logpose/backups (o primeiro já foi feito agora)."

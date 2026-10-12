@@ -6,7 +6,10 @@
 # recriar os containers não mexe em nenhum dos dois.
 set -eu
 
-COMPOSE="docker compose -f docker-compose.vps.yml -f docker-compose.caddy.yml"
+ARQS="-f docker-compose.vps.yml -f docker-compose.caddy.yml"
+# Servidor pequeno: painel já montado em ./frontend_dist (enviado por deploy/publicar-oracle.sh)
+[ -f frontend_dist/index.html ] && ARQS="$ARQS -f docker-compose.prebuilt.yml"
+COMPOSE="docker compose $ARQS"
 
 echo "== 1/4 Backup antes de atualizar"
 $COMPOSE exec -T backup backup.sh once

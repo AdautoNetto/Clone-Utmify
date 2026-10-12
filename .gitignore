@@ -34,3 +34,5 @@ CLAUDE.md
 # Pastas Ocultas
 .gemini
 .gemini/
+# Painel já montado, enviado ao servidor pequeno (não vai para o git)
+/frontend_dist/

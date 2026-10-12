@@ -1,0 +1,8 @@
+# Acrescente este arquivo quando o painel vem pronto em ./frontend_dist
+# (servidor pequeno). Os scripts deploy/instalar.sh e deploy/atualizar.sh já
+# fazem isso sozinhos quando a pasta frontend_dist existe.
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prebuilt
