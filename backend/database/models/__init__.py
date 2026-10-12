@@ -1,4 +1,4 @@
-from database.models.account import Account, WebhookRoute
+from database.models.account import Account, WebhookRoute, PasswordReset, PlatformSetting
 from database.models.admin import Admin, UserRole
 from database.models.company import CompanySettings
 from database.models.customer import Customer
@@ -24,6 +24,8 @@ from database.models.product_alias import ProductAlias
 __all__ = [
     "Account",
     "WebhookRoute",
+    "PasswordReset",
+    "PlatformSetting",
     "Admin",
     "UserRole",
     "CompanySettings",

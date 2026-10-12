@@ -109,12 +109,15 @@ def create_account(data: SetupRequest, request: Request, db: Session = Depends(g
         account = Account(name=name[:100])
         db.add(account)
         db.flush()
+        # A primeira pessoa a se cadastrar numa instalação nova administra o sistema
+        first_ever = db.query(Admin.id).filter(Admin.is_platform_admin.is_(True)).first() is None
         db.add(Admin(
             name=name[:100],
             email=email,
             password_hash=hash_password(data.password),
             role=UserRole.owner,
             account_id=account.id,
+            is_platform_admin=first_ever,
         ))
         db.flush()
         # Mesma transação: ou a conta nasce completa (usuário + tabelas), ou nada fica

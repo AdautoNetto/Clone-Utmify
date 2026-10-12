@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 import bcrypt
 from database.core.connection import get_db
+from database.models.account import Account
 from database.models.admin import Admin
 from api.auth.token import create_access_token
 from api.auth.ratelimit import SlidingWindow, client_ip
@@ -47,6 +48,13 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
         login_failures.add(key)
         raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
 
+    account = db.get(Account, admin.account_id)
+    if account is None or account.blocked:
+        raise HTTPException(
+            status_code=403,
+            detail="Esta conta está bloqueada. Fale com quem administra o sistema.",
+        )
+
     login_failures.clear(key)
     token = create_access_token({
         "sub": str(admin.id),
@@ -63,5 +71,6 @@ def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
             "name": admin.name,
             "email": admin.email,
             "role": admin.role.value,
+            "is_platform_admin": bool(admin.is_platform_admin),
         },
     }

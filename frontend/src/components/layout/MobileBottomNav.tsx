@@ -21,9 +21,11 @@ import {
   RiTeamLine,
   RiUserLine,
   RiSettings3Line,
+  RiShieldUserLine,
 } from "@remixicon/react";
 import { MoreDropdown, type MoreItem } from "./MobileMoreDropdown";
-import { getStoredUser, logout } from "@/services/auth";
+import { logout } from "@/services/auth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAdvancedFeatures } from "@/contexts/AdvancedFeaturesContext";
 
 type UserRole = "owner" | "admin" | "viewer";
@@ -38,7 +40,7 @@ const NAV_ITEMS = [
 
 // Mesmas páginas do menu lateral do computador (AppSidebar), com as mesmas
 // regras de papel e de recurso — no celular nada pode ficar inacessível.
-const MORE_ITEMS: (MoreItem & { roles?: UserRole[]; featureKey?: "stripe_enabled" })[] = [
+const MORE_ITEMS: (MoreItem & { roles?: UserRole[]; featureKey?: "stripe_enabled"; platformAdminOnly?: boolean })[] = [
   { group: "Análise", label: "Vendas", icon: RiShoppingCartLine, path: "/sales" },
   { group: "Análise", label: "Clientes", icon: RiGroupLine, path: "/customers" },
   { group: "Análise", label: "Reembolsos", icon: RiRefundLine, path: "/refunds" },
@@ -52,6 +54,7 @@ const MORE_ITEMS: (MoreItem & { roles?: UserRole[]; featureKey?: "stripe_enabled
   { group: "Integrações", label: "Stripe", icon: RiBankCardLine, path: "/stripe", roles: ["owner", "admin"], featureKey: "stripe_enabled" },
   { group: "Integrações", label: "Gemini API", icon: RiGeminiLine, path: "/gemini", roles: ["owner", "admin"] },
   { group: "Conta", label: "Usuários", icon: RiTeamLine, path: "/users", roles: ["owner", "admin"] },
+  { group: "Conta", label: "Contas", icon: RiShieldUserLine, path: "/accounts", platformAdminOnly: true },
   { group: "Conta", label: "Perfil", icon: RiUserLine, path: "/profile" },
   { group: "Conta", label: "Opções Avançadas", icon: RiSettings3Line, path: "/advanced-settings", roles: ["owner"] },
 ];
@@ -65,12 +68,14 @@ export function MobileBottomNav({ onOpenAI }: MobileBottomNavProps) {
   const navigate = useNavigate();
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const moreRef = useRef<HTMLDivElement>(null);
-  const role: UserRole = getStoredUser()?.role ?? "owner";
+  const currentUser = useCurrentUser();
+  const role: UserRole = currentUser?.role ?? "owner";
   const { features } = useAdvancedFeatures();
 
   const moreItems = MORE_ITEMS.filter((item) => {
     if (item.roles && !item.roles.includes(role)) return false;
     if (item.featureKey && !features[item.featureKey]) return false;
+    if (item.platformAdminOnly && !currentUser?.is_platform_admin) return false;
     return true;
   });
 

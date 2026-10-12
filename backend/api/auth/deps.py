@@ -3,6 +3,7 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from database.core.connection import get_db
 from api.auth.token import verify_token
+from database.models.account import Account
 from database.models.admin import Admin, UserRole
 
 security = HTTPBearer()
@@ -75,8 +76,26 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    account = db.get(Account, admin.account_id)
+    if account is None or account.blocked:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Esta conta está bloqueada. Fale com quem administra o sistema.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     _block_viewer_writes(request, admin)
     return admin
+
+
+def require_platform_admin(current_user: Admin = Depends(get_current_user)) -> Admin:
+    """Só quem administra o SISTEMA (tela Contas). Ser dono de uma conta não basta."""
+    if not current_user.is_platform_admin:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Só quem administra o sistema pode acessar",
+        )
+    return current_user
 
 
 def require_role(*roles: UserRole):

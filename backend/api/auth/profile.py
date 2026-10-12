@@ -26,6 +26,7 @@ def get_profile(current_user: Admin = Depends(get_current_user)):
         "name": current_user.name,
         "email": current_user.email,
         "role": current_user.role.value,
+        "is_platform_admin": bool(current_user.is_platform_admin),
     }
 
 @router.put("/profile")
@@ -47,7 +48,9 @@ def update_profile(data: ProfileUpdateRequest, current_user: Admin = Depends(get
     return {
         "id": current_user.id,
         "name": current_user.name,
-        "email": current_user.email
+        "email": current_user.email,
+        "role": current_user.role.value,
+        "is_platform_admin": bool(current_user.is_platform_admin),
     }
 
 @router.put("/profile/password")

@@ -162,7 +162,8 @@ def test_eventos_exigem_login(ctx):
 # ── Permissões: "viewer" (visualizador) é somente leitura ──────────────────
 
 _ROTAS_PUBLICAS = {"/api/login", "/api/setup", "/api/setup/status", "/api/setup/invite/{token}",
-                   "/api/webhook/{platform}/{slug}"}
+                   "/api/webhook/{platform}/{slug}",
+                   "/api/password/forgot", "/api/password/reset/{token}"}
 _VIEWER_PODE = {("PUT", "/api/profile"), ("PUT", "/api/profile/password"),
                 ("POST", "/api/gemini/chat"), ("POST", "/api/gemini/daily-report")}
 

@@ -4,6 +4,9 @@ import { AppGuard } from "@/components/layout/AppGuard";
 import { DashboardLayout } from "@/components/layout/DashboardLayout";
 import SetupPage from "@/pages/setup";
 import LoginPage from "@/pages/login";
+import ForgotPasswordPage from "@/pages/forgot";
+import ResetPasswordPage from "@/pages/reset";
+import AccountsPage from "@/pages/accounts";
 import DashboardPage from "@/pages/dashboard";
 import CampaignsPage from "@/pages/campaigns";
 import SalesPage from "@/pages/sales";
@@ -44,6 +47,8 @@ export default function App() {
           <Routes>
             <Route path="/setup" element={<SetupPage />} />
             <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot" element={<ForgotPasswordPage />} />
+            <Route path="/reset" element={<ResetPasswordPage />} />
 
             <Route element={<DashboardLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
@@ -62,6 +67,7 @@ export default function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/gemini" element={<GeminiPage />} />
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/accounts" element={<AccountsPage />} />
               <Route path="/stripe" element={<StripePage />} />
               <Route path="/subscriptions" element={<SubscriptionsPage />} />
               <Route path="/advanced-settings" element={<AdvancedSettingsPage />} />

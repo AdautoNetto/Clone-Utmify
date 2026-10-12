@@ -1,7 +1,8 @@
 """
 Preparação do banco no boot e criação do compartimento (schema) de cada conta.
 
-- Tabelas globais (schema public): accounts, admins, webhook_routes.
+- Tabelas globais (schema public): accounts, admins, webhook_routes,
+  password_resets e platform_settings.
 - Tabelas de negócio: uma cópia por conta, no schema conta_<id>.
 - Instalação antiga (conta única, tudo no public): as tabelas são MOVIDAS para
   o schema da primeira conta (nada é apagado nem copiado).
@@ -19,7 +20,7 @@ import database.models  # noqa: F401  (registra todos os modelos no Base)
 
 logger = logging.getLogger(__name__)
 
-_GLOBAL_TABLE_NAMES = {"accounts", "admins", "webhook_routes"}
+_GLOBAL_TABLE_NAMES = {"accounts", "admins", "webhook_routes", "password_resets", "platform_settings"}
 _GLOBAL_ENUM_TYPES = {"userrole"}
 
 
@@ -130,9 +131,25 @@ def bootstrap_database() -> None:
             "ALTER TABLE public.admins ADD COLUMN IF NOT EXISTS account_id INTEGER "
             "REFERENCES public.accounts(id)"
         )
+        conn.exec_driver_sql(
+            "ALTER TABLE public.admins ADD COLUMN IF NOT EXISTS is_platform_admin BOOLEAN "
+            "NOT NULL DEFAULT false"
+        )
+        conn.exec_driver_sql(
+            "ALTER TABLE public.accounts ADD COLUMN IF NOT EXISTS blocked BOOLEAN NOT NULL DEFAULT false"
+        )
         legacy = _legacy_tables(conn)
         if legacy:
             _move_legacy_to_schema(conn, legacy)
+        # Sempre existe um administrador do sistema: se ninguém é, passa a ser o
+        # dono da conta mais antiga (quem instalou).
+        conn.exec_driver_sql(
+            "UPDATE public.admins SET is_platform_admin = true WHERE id = ("
+            "  SELECT id FROM public.admins"
+            "  WHERE role::text = 'owner' AND account_id IS NOT NULL AND email IS NOT NULL"
+            "  ORDER BY account_id, id LIMIT 1"
+            ") AND NOT EXISTS (SELECT 1 FROM public.admins WHERE is_platform_admin)"
+        )
         account_ids = conn.execute(text("SELECT id FROM public.accounts ORDER BY id")).scalars().all()
 
     for account_id in account_ids:

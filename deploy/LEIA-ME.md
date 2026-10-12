@@ -27,6 +27,26 @@ Tudo aqui foi pensado para **nunca perder venda nem métrica**:
 - Quem já usava a versão de conta única: na primeira subida da versão nova, tudo o que existia vira a
   **conta nº 1** (do dono antigo), sem perder nada. Todos precisam fazer login de novo uma vez.
 
+### Quem administra o sistema (tela Contas)
+
+- **A primeira conta criada administra o sistema.** Só ela vê o menu **Contas** (no celular: Mais → Contas).
+- Em **Contas** aparecem todas as contas (dono, usuários, número de vendas, última venda) e, em **Ações**:
+  - **Link de senha nova:** gera um link de uso único (24 h) para o dono daquela conta criar outra senha.
+  - **Bloquear / Desbloquear:** ninguém daquela conta entra; as vendas dela continuam sendo recebidas.
+  - **Excluir conta:** apaga os logins e todos os dados daquela conta. Pede o e-mail do dono para
+    confirmar. Só volta restaurando um backup. Não dá para bloquear nem excluir a própria conta.
+
+### Esqueci minha senha
+
+- Na tela de login há o link **Esqueci minha senha**.
+- **Com envio de e-mail ligado:** a pessoa digita o e-mail e recebe um link (vale 1 hora, uma vez só).
+- **Sem envio de e-mail:** a tela avisa para pedir o link a quem administra o sistema, que o gera em
+  **Contas → Ações → Link de senha nova** e manda por WhatsApp, por exemplo.
+- **Ligar o envio de e-mail** (em **Contas → Envio de e-mail**, só quem administra): servidor
+  (`smtp.gmail.com`), porta (`465`), o e-mail que envia, a **senha de app** desse e-mail, o nome que
+  aparece para quem recebe e o endereço do painel. Salve e use **Enviar e-mail de teste para mim**.
+  A senha de app fica guardada no servidor e nunca volta para a tela.
+
 > Regra de ouro: **nunca** apague o volume `logpose_pgdata`. No Coolify, ao excluir um recurso, deixe **desmarcada** a opção de apagar volumes. No Docker puro, nunca use `docker compose down -v`.
 
 ---

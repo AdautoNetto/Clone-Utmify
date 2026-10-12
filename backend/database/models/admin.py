@@ -1,5 +1,5 @@
 import enum
-from sqlalchemy import Column, Integer, String, DateTime, Enum, ForeignKey
+from sqlalchemy import Boolean, Column, Integer, String, DateTime, Enum, ForeignKey, text
 from database.core.connection import Base
 from database.core.timezone import CREATED_AT_DEFAULT
 
@@ -26,4 +26,6 @@ class Admin(Base):
         nullable=False, default=UserRole.admin,
     )
     invite_token = Column(String(255), unique=True, nullable=True)
+    # Administra o SISTEMA (vê e remove contas). Não é o mesmo que ser dono de uma conta.
+    is_platform_admin = Column(Boolean, nullable=False, default=False, server_default=text("false"))
     created_at = Column(DateTime, server_default=CREATED_AT_DEFAULT)

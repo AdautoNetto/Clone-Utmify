@@ -16,6 +16,8 @@ from database.core.connection import engine
 from api.auth.setup import router as setup_router
 from api.auth.login import router as login_router
 from api.auth.profile import router as profile_router
+from api.auth.password_reset import router as password_reset_router
+from api.platform.accounts import router as platform_accounts_router
 from api.company.settings import router as company_router
 from api.company.dashboard import router as company_dash_router
 from api.vturb.accounts import router as vturb_router
@@ -139,6 +141,8 @@ app.add_middleware(
 # API routes
 app.include_router(setup_router, prefix="/api")
 app.include_router(login_router, prefix="/api")
+app.include_router(password_reset_router, prefix="/api")
+app.include_router(platform_accounts_router, prefix="/api")
 app.include_router(company_router, prefix="/api")
 app.include_router(company_dash_router, prefix="/api")
 app.include_router(profile_router, prefix="/api")

@@ -3,6 +3,7 @@ from fastapi.testclient import TestClient
 from sqlalchemy import text
 
 import app as app_module
+from api.auth import password_reset
 from api.auth.login import login_failures
 from api.auth.setup import signup_limiter
 from database.core.connection import account_session, engine
@@ -21,11 +22,13 @@ def reset_db():
         for schema in schemas:
             conn.exec_driver_sql(f'DROP SCHEMA "{schema}" CASCADE')
         conn.execute(text(
-            "TRUNCATE public.webhook_routes, public.admins, public.accounts "
-            "RESTART IDENTITY CASCADE"
+            "TRUNCATE public.webhook_routes, public.password_resets, public.platform_settings, "
+            "public.admins, public.accounts RESTART IDENTITY CASCADE"
         ))
     signup_limiter.clear()
     login_failures.clear()
+    for limiter in (password_reset.forgot_by_ip, password_reset.forgot_by_email, password_reset.reset_attempts):
+        limiter.clear()
 
 
 def entrar(email, senha=SENHA):

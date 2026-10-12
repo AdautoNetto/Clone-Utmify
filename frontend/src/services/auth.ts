@@ -17,15 +17,19 @@ interface LoginData {
   password: string;
 }
 
+export interface StoredUser {
+  id: number;
+  name: string;
+  email: string;
+  role: "owner" | "admin" | "viewer";
+  /** Administra o SISTEMA (tela Contas). Não é o mesmo que ser dono de uma conta. */
+  is_platform_admin?: boolean;
+}
+
 interface LoginResponse {
   access_token: string;
   token_type: string;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-    role: "owner" | "admin" | "viewer";
-  };
+  user: StoredUser;
 }
 
 export async function checkSetupStatus(): Promise<SetupStatus> {
@@ -62,9 +66,28 @@ export function logout() {
   clearAccountData();
 }
 
-export function getStoredUser() {
+export function getStoredUser(): StoredUser | null {
   const user = localStorage.getItem("user");
-  return user ? JSON.parse(user) : null;
+  return user ? (JSON.parse(user) as StoredUser) : null;
+}
+
+// ── Esqueci minha senha ──
+
+export async function requestPasswordReset(email: string): Promise<{ email_enabled: boolean }> {
+  return apiRequest("/password/forgot", { method: "POST", body: { email } });
+}
+
+export async function checkResetToken(token: string): Promise<{ valid: boolean }> {
+  return apiRequest(`/password/reset/${encodeURIComponent(token)}`);
+}
+
+export async function resetPassword(
+  token: string, password: string, confirmPassword: string
+): Promise<{ message: string }> {
+  return apiRequest(`/password/reset/${encodeURIComponent(token)}`, {
+    method: "POST",
+    body: { password, confirm_password: confirmPassword },
+  });
 }
 
 export function isAuthenticated(): boolean {

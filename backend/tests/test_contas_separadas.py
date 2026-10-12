@@ -222,7 +222,8 @@ def test_token_apontando_para_outra_conta_e_recusado(contas):
 
 
 _ROTAS_PUBLICAS = {"/api/login", "/api/setup", "/api/setup/status", "/api/setup/invite/{token}",
-                   "/api/webhook/{platform}/{slug}"}
+                   "/api/webhook/{platform}/{slug}",
+                   "/api/password/forgot", "/api/password/reset/{token}"}
 
 
 def test_sem_login_nenhuma_rota_entrega_dado(contas):
@@ -259,7 +260,7 @@ def test_tabelas_de_negocio_nao_existem_fora_dos_compartimentos(contas):
     with engine.connect() as conn:
         no_public = set(conn.execute(text(
             "SELECT tablename FROM pg_tables WHERE schemaname = 'public'")).scalars())
-    assert no_public == {"accounts", "admins", "webhook_routes"}
+    assert no_public == {"accounts", "admins", "webhook_routes", "password_resets", "platform_settings"}
 
 
 def test_cache_de_anuncios_e_separado_por_conta(contas):
@@ -299,7 +300,7 @@ def test_instalacao_de_conta_unica_vira_a_conta_1_sem_perder_nada():
     with engine.connect() as conn:
         no_public = set(conn.execute(text(
             "SELECT tablename FROM pg_tables WHERE schemaname = 'public'")).scalars())
-        assert no_public == {"accounts", "admins", "webhook_routes"}
+        assert no_public == {"accounts", "admins", "webhook_routes", "password_resets", "platform_settings"}
         assert conn.execute(text("SELECT count(*) FROM public.accounts")).scalar_one() == 1
     dona = entrar("antiga@teste.com")
     lista = client.get("/api/sales/transactions", headers=dona).json()

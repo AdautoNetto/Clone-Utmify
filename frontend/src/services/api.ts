@@ -1,6 +1,7 @@
 import { getCookie, removeCookie } from "@/lib/cookies";
 import { getMockData } from "./mockInterceptor";
 import { IS_DEMO, getDemoData } from "./demoInterceptor";
+import { isPublicPath } from "@/lib/publicPaths";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "/api";
 
@@ -72,9 +73,9 @@ export async function apiRequest<T>(
       localStorage.removeItem("user");
 
       // Evitar loop infinito — só redireciona se não estiver já redirecionando
-      // e se não estiver em /login ou /setup
+      // e se não estiver numa tela pública (login, cadastro, senha nova)
       const currentPath = window.location.pathname;
-      if (!isRedirecting && currentPath !== "/login" && currentPath !== "/setup") {
+      if (!isRedirecting && !isPublicPath(currentPath)) {
         isRedirecting = true;
         window.location.replace("/login");
       }

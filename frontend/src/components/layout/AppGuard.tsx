@@ -1,19 +1,17 @@
 import { useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { isAuthenticated, logout } from "@/services/auth";
+import { isPublicPath } from "@/lib/publicPaths";
 
 interface AppGuardProps {
   children: React.ReactNode;
 }
 
-// Multi-conta: /login (entrar) e /setup (criar conta ou aceitar convite) são
-// públicas; todo o resto exige login.
-const PUBLIC_PATHS = ["/login", "/setup"];
-
 export function AppGuard({ children }: AppGuardProps) {
   const navigate = useNavigate();
   const location = useLocation();
-  const blocked = !PUBLIC_PATHS.includes(location.pathname) && !isAuthenticated();
+  // Fora das telas públicas (entrar, criar conta, senha nova), tudo exige login
+  const blocked = !isPublicPath(location.pathname) && !isAuthenticated();
 
   useEffect(() => {
     if (blocked) {

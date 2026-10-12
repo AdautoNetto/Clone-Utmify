@@ -15,6 +15,7 @@ import {
   RiTeamLine,
   RiRepeatLine,
   RiBankCardLine,
+  RiShieldUserLine,
 } from "@remixicon/react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
@@ -27,7 +28,7 @@ import { SidebarNavGroup } from "./SidebarNavGroup";
 import { SidebarUser } from "./SidebarUser";
 import { AiTrainingProfile } from "./AiTrainingProfile";
 import { ValeLogo } from "@/components/brand/ValeLogo";
-import { getStoredUser } from "@/services/auth";
+import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useAdvancedFeatures } from "@/contexts/AdvancedFeaturesContext";
 import type { RemixiconComponentType } from "@remixicon/react";
 
@@ -39,6 +40,7 @@ interface NavItem {
   url: string;
   roles?: UserRole[]; // if omitted, visible to all
   featureKey?: "stripe_enabled"; // ties to advanced features
+  platformAdminOnly?: boolean; // só para quem administra o sistema
 }
 
 interface NavGroup {
@@ -86,6 +88,7 @@ const navGroups: NavGroup[] = [
     label: "Gestão",
     items: [
       { title: "Usuários", icon: RiTeamLine, url: "/users", roles: ["owner", "admin"] },
+      { title: "Contas", icon: RiShieldUserLine, url: "/accounts", platformAdminOnly: true },
     ],
   },
 ];
@@ -93,7 +96,8 @@ const navGroups: NavGroup[] = [
 function filterNavGroups(
   groups: NavGroup[],
   role: UserRole,
-  features: Record<string, boolean>
+  features: Record<string, boolean>,
+  isPlatformAdmin: boolean
 ): NavGroup[] {
   return groups
     .map((group) => ({
@@ -101,6 +105,7 @@ function filterNavGroups(
       items: group.items.filter((item) => {
         if (item.roles && !item.roles.includes(role)) return false;
         if (item.featureKey && !features[item.featureKey]) return false;
+        if (item.platformAdminOnly && !isPlatformAdmin) return false;
         return true;
       }),
     }))
@@ -110,11 +115,11 @@ function filterNavGroups(
 export function AppSidebar() {
   const location = useLocation();
   const navigate = useNavigate();
-  const user = getStoredUser();
+  const user = useCurrentUser();
   const role: UserRole = user?.role ?? "owner";
   const { features } = useAdvancedFeatures();
 
-  const visibleGroups = filterNavGroups(navGroups, role, { ...features });
+  const visibleGroups = filterNavGroups(navGroups, role, { ...features }, !!user?.is_platform_admin);
 
   return (
     // Faixa azul-marinho de altura total, como o rail do SaaS Vale Tec

@@ -26,7 +26,12 @@ export default function LoginPage() {
   return (
     <AuthShell title="Entrar" subtitle="Acesse o painel de vendas">
       <LoginForm onSubmit={handleSubmit} error={error} loading={loading} />
-      <p className="mt-5 text-center text-sm text-muted-foreground">
+      <p className="mt-4 text-center text-sm">
+        <Link to="/forgot" className="font-bold text-primary hover:underline">
+          Esqueci minha senha
+        </Link>
+      </p>
+      <p className="mt-3 text-center text-sm text-muted-foreground">
         Ainda não tem conta?{" "}
         <Link to="/setup" className="font-bold text-primary hover:underline">
           Criar conta
