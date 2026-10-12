@@ -47,6 +47,33 @@ Tudo aqui foi pensado para **nunca perder venda nem métrica**:
 3. `sh deploy/instalar.sh logpose.seudominio.com.br` (instala o Docker se faltar, gera as senhas no servidor, liga tudo com HTTPS). ~8 min.
 4. **Atualizar depois:** `cd /opt/logpose/app && sh deploy/atualizar.sh` (faz backup, baixa, troca, confere).
 
+## Opção C — Oracle Cloud "Always Free" (máquina micro de 1 GB)
+
+Foi o caminho usado na instalação atual. Diferenças para as opções acima:
+
+- A máquina gratuita que costuma ter vaga é a **VM.Standard.E2.1.Micro** (1 GB de memória). A ARM
+  (A1.Flex, bem mais forte) vive com "capacidade insuficiente" em São Paulo; vale tentar de novo depois.
+- Com 1 GB **não dá para montar o painel dentro do servidor**. O painel é montado no seu computador e
+  enviado pronto (pasta `frontend_dist`); os scripts percebem a pasta e usam `Dockerfile.prebuilt`.
+- A Oracle tem **dois** bloqueios de porta: a "Lista de Segurança" da sub-rede (no painel da Oracle) e o
+  firewall interno do Ubuntu. Os dois precisam liberar 80 e 443.
+
+Passos (uma vez):
+
+1. No painel da Oracle: criar a rede pelo **Assistente de VCN** ("VCN com conectividade de internet") e a
+   instância **Ubuntu 24.04 / VM.Standard.E2.1.Micro** na sub-rede pública, com IP público e a sua chave SSH.
+2. Na Lista de Segurança padrão da rede: regra de entrada **TCP 80,443** de `0.0.0.0/0`.
+3. No servidor: `git clone <repo> /opt/logpose/app && cd /opt/logpose/app && sudo sh deploy/oracle-preparar.sh`
+   (cria 3 GB de swap e libera 80/443 no firewall interno).
+4. No seu computador: `SERVIDOR=ubuntu@IP sh deploy/publicar-oracle.sh` envia o painel (na 1ª vez, envie o
+   painel e depois rode no servidor `sudo sh deploy/instalar.sh <dominio>`).
+
+Sem domínio próprio, use `IP-COM-TRACOS.sslip.io` (ex.: `137-131-175-179.sslip.io`): aponta sozinho para o
+IP e o Caddy consegue o cadeado (HTTPS) normalmente. Quando tiver um subdomínio, troque `DOMINIO` no `.env`
+do servidor e rode `sudo sh deploy/atualizar.sh`.
+
+**Atualizar depois:** `git push` e, no seu computador, `SERVIDOR=ubuntu@IP sh deploy/publicar-oracle.sh`.
+
 ## Backups
 
 - Ver os backups: `ls -lh /opt/logpose/backups`
