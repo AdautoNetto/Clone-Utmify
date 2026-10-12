@@ -55,7 +55,7 @@ export function ChangePasswordForm() {
           <PasswordField
             id="new-pw"
             label="Nova Senha"
-            placeholder="Mínimo 6 caracteres"
+            placeholder="Mínimo 8 caracteres"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
             show={showNew}
@@ -102,7 +102,7 @@ function PasswordField({
           onChange={onChange}
           placeholder={placeholder}
           required
-          minLength={6}
+          minLength={8}
         />
         <button
           type="button"

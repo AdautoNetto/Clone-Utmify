@@ -5,6 +5,8 @@ from sqlalchemy.exc import IntegrityError
 from starlette.concurrency import run_in_threadpool
 
 from database.core.connection import SessionLocal
+from database.core.tenancy import account_context
+from database.models.account import WebhookRoute
 from database.core.timezone import now_sp
 from database.models.webhook_endpoint import WebhookEndpoint, WebhookPlatform
 from database.models.webhook_event import WebhookEvent
@@ -56,8 +58,23 @@ async def receive_webhook(platform: str, slug: str, request: Request):
         raise HTTPException(status_code=400, detail="Payload JSON inválido")
 
     # Banco é síncrono: roda fora do event loop para não travar as outras requisições
-    event_id = await run_in_threadpool(store_webhook, platform_enum, slug, payload)
-    return await run_in_threadpool(run_stored_webhook, event_id)
+    account_id = await run_in_threadpool(_account_of_slug, slug)
+    if account_id is None:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Webhook endpoint '{slug}' não encontrado para '{platform_enum.value}'",
+        )
+    # A venda não traz login: a conta é a dona do endereço (slug). Tudo que roda
+    # daqui para baixo só enxerga os dados dessa conta.
+    with account_context(account_id):
+        event_id = await run_in_threadpool(store_webhook, platform_enum, slug, payload)
+        return await run_in_threadpool(run_stored_webhook, event_id)
+
+
+def _account_of_slug(slug: str) -> int | None:
+    with SessionLocal() as db:
+        route = db.get(WebhookRoute, slug[:50])
+        return route.account_id if route else None
 
 
 def store_webhook(platform_enum: WebhookPlatform, slug: str, payload) -> int:

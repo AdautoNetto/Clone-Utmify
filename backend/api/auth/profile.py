@@ -4,7 +4,9 @@ from pydantic import BaseModel, EmailStr
 import bcrypt
 
 from database.core.connection import get_db
+from sqlalchemy import func
 from database.models.admin import Admin
+from api.auth.setup import check_new_password, hash_password
 from api.auth.deps import get_current_user
 
 router = APIRouter()
@@ -29,13 +31,16 @@ def get_profile(current_user: Admin = Depends(get_current_user)):
 @router.put("/profile")
 def update_profile(data: ProfileUpdateRequest, current_user: Admin = Depends(get_current_user), db: Session = Depends(get_db)):
     # Check if email is already taken by another admin
-    if data.email != current_user.email:
-        existing = db.query(Admin).filter(Admin.email == data.email).first()
+    email = data.email.strip().lower()
+    if email != (current_user.email or "").lower():
+        existing = db.query(Admin).filter(
+            func.lower(Admin.email) == email, Admin.id != current_user.id
+        ).first()
         if existing:
             raise HTTPException(status_code=400, detail="Email already registered")
     
     current_user.name = data.name
-    current_user.email = data.email
+    current_user.email = email
     db.commit()
     db.refresh(current_user)
     
@@ -50,8 +55,8 @@ def change_password(data: PasswordChangeRequest, current_user: Admin = Depends(g
     if data.new_password != data.confirm_password:
         raise HTTPException(status_code=400, detail="As senhas não coincidem")
         
-    hashed = bcrypt.hashpw(data.new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-    current_user.password_hash = hashed
+    check_new_password(data.new_password, data.confirm_password)
+    current_user.password_hash = hash_password(data.new_password)
     db.commit()
     
     return {"message": "Senha atualizada com sucesso"}

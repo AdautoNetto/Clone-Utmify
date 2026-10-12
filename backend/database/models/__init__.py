@@ -1,3 +1,4 @@
+from database.models.account import Account, WebhookRoute
 from database.models.admin import Admin, UserRole
 from database.models.company import CompanySettings
 from database.models.customer import Customer
@@ -21,6 +22,8 @@ from database.models.stripe_account import StripeAccount
 from database.models.product_alias import ProductAlias
 
 __all__ = [
+    "Account",
+    "WebhookRoute",
     "Admin",
     "UserRole",
     "CompanySettings",

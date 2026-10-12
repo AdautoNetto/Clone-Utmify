@@ -36,12 +36,20 @@ export async function createAdmin(data: SetupData): Promise<{ message: string }>
   return apiRequest("/setup", { method: "POST", body: data });
 }
 
+// Guardados no navegador por conta: não podem passar de uma conta para outra
+const PER_ACCOUNT_KEYS = ["logpose-ai-chat", "logpose-daily-report-cache", "logpose-daily-report-ts"];
+
+function clearAccountData() {
+  PER_ACCOUNT_KEYS.forEach((key) => localStorage.removeItem(key));
+}
+
 export async function loginUser(data: LoginData): Promise<LoginResponse> {
   const response = await apiRequest<LoginResponse>("/login", {
     method: "POST",
     body: data,
   });
 
+  clearAccountData();
   setCookie("access_token", response.access_token, 30);
   localStorage.setItem("user", JSON.stringify(response.user));
 
@@ -51,6 +59,7 @@ export async function loginUser(data: LoginData): Promise<LoginResponse> {
 export function logout() {
   removeCookie("access_token");
   localStorage.removeItem("user");
+  clearAccountData();
 }
 
 export function getStoredUser() {

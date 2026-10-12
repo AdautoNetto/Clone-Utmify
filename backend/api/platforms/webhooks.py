@@ -6,6 +6,8 @@ from datetime import datetime
 
 from database.core.connection import get_db
 from database.models.webhook_endpoint import WebhookEndpoint, WebhookPlatform
+from database.models.account import WebhookRoute
+from database.models.admin import Admin
 from api.auth.deps import get_current_user
 
 router = APIRouter(prefix="/platforms", tags=["platforms"])
@@ -49,13 +51,17 @@ def list_webhooks(
 def create_webhook(
     payload: WebhookCreate,
     db: Session = Depends(get_db),
-    _=Depends(get_current_user),
+    current_user: Admin = Depends(get_current_user),
 ):
     platform_value = payload.platform.lower()
     if platform_value not in [p.value for p in WebhookPlatform]:
         raise HTTPException(status_code=400, detail="Plataforma inválida")
 
-    slug = uuid.uuid4().hex[:8]
+    # O endereço (slug) é único no sistema inteiro: é ele que diz de qual conta é a venda
+    slug = uuid.uuid4().hex[:12]
+    while db.get(WebhookRoute, slug) is not None:
+        slug = uuid.uuid4().hex[:12]
+    db.add(WebhookRoute(slug=slug, account_id=current_user.account_id))
 
     endpoint = WebhookEndpoint(
         slug=slug,
@@ -84,5 +90,6 @@ def delete_webhook(
     endpoint = db.query(WebhookEndpoint).filter(WebhookEndpoint.id == webhook_id).first()
     if not endpoint:
         raise HTTPException(status_code=404, detail="Webhook não encontrado")
+    db.query(WebhookRoute).filter(WebhookRoute.slug == endpoint.slug).delete()
     db.delete(endpoint)
     db.commit()

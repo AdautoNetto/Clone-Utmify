@@ -10,6 +10,13 @@ import { useState } from "react";
 import type { WebhookEndpointAPI } from "@/services/integrations";
 import { PlatformLogo } from "@/components/PlatformLogo";
 
+// Endereço que as plataformas de venda chamam. Quando o painel é servido por outro
+// lugar (ex.: Vercel na frente), VITE_WEBHOOK_ORIGIN aponta direto para o servidor:
+// a venda não depende de um intermediário para chegar.
+const WEBHOOK_ORIGIN: string =
+  (import.meta.env.VITE_WEBHOOK_ORIGIN as string | undefined)?.replace(/\/$/, "") ||
+  window.location.origin;
+
 interface PlatformsTableProps {
   endpoints: WebhookEndpointAPI[];
   isLoading: boolean;
@@ -38,7 +45,7 @@ export function PlatformsTable({ endpoints, isLoading, onDelete }: PlatformsTabl
   const [copiedId, setCopiedId] = useState<number | null>(null);
 
   const handleCopy = (endpoint: WebhookEndpointAPI) => {
-    const url = `${window.location.origin}${buildWebhookUrl(endpoint)}`;
+    const url = `${WEBHOOK_ORIGIN}${buildWebhookUrl(endpoint)}`;
     navigator.clipboard.writeText(url);
     setCopiedId(endpoint.id);
     setTimeout(() => setCopiedId(null), 2000);
@@ -89,7 +96,7 @@ export function PlatformsTable({ endpoints, isLoading, onDelete }: PlatformsTabl
                     <TableCell>{platformBadge(ep.platform)}</TableCell>
                     <TableCell>
                       <code className="font-mono text-muted-foreground bg-muted/50 px-2 py-1 rounded text-xs">
-                        {window.location.origin}{webhookUrl}
+                        {WEBHOOK_ORIGIN}{webhookUrl}
                       </code>
                     </TableCell>
                     <TableCell className="tabular-nums text-muted-foreground">

@@ -1,8 +1,11 @@
 import os
 import time
 import logging
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, event, text
 from sqlalchemy.orm import sessionmaker, declarative_base
+from database.core.tenancy import (
+    NO_TENANT_SCHEMA, current_schema, is_valid_schema, schema_for,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +30,24 @@ def _normalize_url(url: str) -> str:
 engine = create_engine(_normalize_url(DATABASE_URL), pool_pre_ping=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
+
+@event.listens_for(SessionLocal, "after_begin")
+def _apontar_para_a_conta(session, transaction, connection):
+    """
+    A cada transação, o banco passa a enxergar SÓ o schema da conta atual
+    (SET LOCAL vale até o commit/rollback, então nada "gruda" na conexão do pool).
+    A conta vem de session.info["schema"] (uso interno/testes) ou da requisição.
+    """
+    schema = session.info.get("schema") or current_schema() or NO_TENANT_SCHEMA
+    if not is_valid_schema(schema):
+        raise RuntimeError(f"schema de conta inválido: {schema!r}")
+    connection.exec_driver_sql(f'SET LOCAL search_path TO "{schema}"')
+
+
+def account_session(account_id: int):
+    """Sessão presa a uma conta específica (tarefas internas e testes)."""
+    return SessionLocal(info={"schema": schema_for(account_id)})
 
 
 def wait_for_database(timeout_seconds: int = 60) -> None:

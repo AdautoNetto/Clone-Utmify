@@ -44,6 +44,7 @@ def create_invite(
         name=data.name.strip(),
         role=UserRole(data.role),
         invite_token=token,
+        account_id=current_user.account_id,  # o convidado entra na conta de quem convidou
     )
     db.add(user)
     db.commit()

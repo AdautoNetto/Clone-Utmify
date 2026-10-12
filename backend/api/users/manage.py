@@ -5,6 +5,7 @@ import bcrypt
 from database.core.connection import get_db
 from database.models.admin import Admin, UserRole
 from api.auth.deps import require_role
+from api.auth.setup import check_new_password, hash_password
 
 router = APIRouter()
 
@@ -26,7 +27,9 @@ def update_user_role(
     db: Session = Depends(get_db),
 ):
     """Change a user's role. Only the owner can do this."""
-    user = db.query(Admin).filter(Admin.id == user_id).first()
+    user = db.query(Admin).filter(
+        Admin.id == user_id, Admin.account_id == current_user.account_id
+    ).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
@@ -49,21 +52,17 @@ def reset_user_password(
     db: Session = Depends(get_db),
 ):
     """Owner resets another user's password."""
-    user = db.query(Admin).filter(Admin.id == user_id).first()
+    user = db.query(Admin).filter(
+        Admin.id == user_id, Admin.account_id == current_user.account_id
+    ).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 
     if user.role == UserRole.owner:
         raise HTTPException(status_code=403, detail="Use o perfil para alterar sua própria senha")
 
-    if data.new_password != data.confirm_password:
-        raise HTTPException(status_code=400, detail="As senhas não coincidem")
-
-    if len(data.new_password) < 6:
-        raise HTTPException(status_code=400, detail="Senha deve ter pelo menos 6 caracteres")
-
-    hashed = bcrypt.hashpw(data.new_password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-    user.password_hash = hashed
+    check_new_password(data.new_password, data.confirm_password)
+    user.password_hash = hash_password(data.new_password)
     db.commit()
     return {"message": "Senha redefinida com sucesso"}
 
@@ -75,7 +74,9 @@ def delete_user(
     db: Session = Depends(get_db),
 ):
     """Delete a user. Owner cannot be deleted."""
-    user = db.query(Admin).filter(Admin.id == user_id).first()
+    user = db.query(Admin).filter(
+        Admin.id == user_id, Admin.account_id == current_user.account_id
+    ).first()
     if not user:
         raise HTTPException(status_code=404, detail="Usuário não encontrado")
 

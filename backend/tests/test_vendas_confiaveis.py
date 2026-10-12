@@ -1,87 +1,32 @@
 """
 Testes do caminho crítico: webhook de venda → banco → métricas.
-
-Rodam contra um Postgres de verdade (o app usa recursos do Postgres).
-Use um banco VAZIO e descartável — os testes apagam tudo dele:
-
-    TEST_DATABASE_URL=postgresql://postgres@localhost:5432/logpose_test pytest backend/tests -q
+(Como rodar: ver tests/conftest.py.)
 """
-import os
 import re
-import uuid
 
 import pytest
+from sqlalchemy import text
 
-TEST_DB = os.getenv("TEST_DATABASE_URL")
-if not TEST_DB:
-    pytest.skip("TEST_DATABASE_URL não definido", allow_module_level=True)
-
-os.environ["DATABASE_URL"] = TEST_DB
-os.environ.setdefault("SECRET_KEY", "chave-so-para-teste-" + uuid.uuid4().hex)
-
-from fastapi.testclient import TestClient  # noqa: E402
-from sqlalchemy import text  # noqa: E402
-
-import app as app_module  # noqa: E402
-from database.core.connection import SessionLocal, engine  # noqa: E402
-from database.models.customer import Customer  # noqa: E402
-from database.models.transaction import Transaction, TransactionStatus  # noqa: E402
-
-client = TestClient(app_module.app)
-
-
-def _reset_db():
-    with engine.begin() as conn:
-        conn.execute(text(
-            "TRUNCATE refund_reasons, customer_products, recoveries, transactions, "
-            "customers, product_aliases, checkouts, order_bumps, upsells, products, "
-            "webhook_endpoints, admins RESTART IDENTITY CASCADE"
-        ))
-        conn.execute(text(
-            "DO $$ BEGIN IF to_regclass('webhook_events') IS NOT NULL "
-            "THEN TRUNCATE webhook_events RESTART IDENTITY; END IF; END $$;"
-        ))
+import app as app_module
+from apoio import client, criar_conta, reset_db, sessao, venda as _venda
+from database.core.connection import engine
+from database.models.customer import Customer
+from database.models.transaction import Transaction, TransactionStatus
 
 
 @pytest.fixture()
 def ctx():
-    _reset_db()
-    r = client.post("/api/setup", json={
-        "name": "Dono", "email": "dono@teste.com",
-        "password": "senha-teste-123", "confirm_password": "senha-teste-123",
-    })
-    assert r.status_code == 200, r.text
-    r = client.post("/api/login", json={"email": "dono@teste.com", "password": "senha-teste-123"})
-    token = r.json()["access_token"]
-    auth = {"Authorization": f"Bearer {token}"}
-    r = client.post("/api/platforms/webhooks", json={"platform": "api", "name": "Loja teste"}, headers=auth)
-    assert r.status_code == 201, r.text
-    return {"auth": auth, "url": f"/api/webhook/api/{r.json()['slug']}"}
-
-
-def _venda(external_id="PED-1", status="approved", amount=197.0, **extra):
-    body = {
-        "external_id": external_id,
-        "status": status,
-        "amount": amount,
-        "product_external_id": "P1",
-        "product_name": "Body Splash",
-        "customer_email": "cliente@exemplo.com.br",
-        "customer_name": "Cliente",
-        "utm_source": "facebook",
-        "utm_campaign": "camp-1",
-    }
-    body.update(extra)
-    return body
+    reset_db()
+    return criar_conta("dono@teste.com")  # primeira conta do banco limpo = conta 1
 
 
 def _tx(external_id):
-    with SessionLocal() as db:
+    with sessao() as db:
         return db.query(Transaction).filter(Transaction.external_id == external_id).one()
 
 
 def _customer(email="cliente@exemplo.com.br"):
-    with SessionLocal() as db:
+    with sessao() as db:
         return db.query(Customer).filter(Customer.email == email).one()
 
 
@@ -97,7 +42,7 @@ def test_venda_aprovada_entra_no_banco(ctx):
 def test_webhook_repetido_nao_duplica(ctx):
     for _ in range(3):
         assert client.post(ctx["url"], json=_venda()).status_code == 200
-    with SessionLocal() as db:
+    with sessao() as db:
         assert db.query(Transaction).count() == 1
     c = _customer()
     assert c.total_orders == 1
@@ -137,7 +82,7 @@ def test_sem_external_id_e_recusado_e_nao_mistura_vendas(ctx):
     r2 = client.post(ctx["url"], json=_venda(external_id="", customer_email="b@exemplo.com.br"))
     assert r1.status_code == 422
     assert r2.status_code == 422
-    with SessionLocal() as db:
+    with sessao() as db:
         assert db.query(Transaction).count() == 0
 
 
@@ -145,7 +90,7 @@ def test_payload_bruto_fica_guardado(ctx):
     client.post(ctx["url"], json=_venda())
     with engine.connect() as conn:
         rows = conn.execute(text(
-            "SELECT external_id, status FROM webhook_events ORDER BY id"
+            "SELECT external_id, status FROM conta_1.webhook_events ORDER BY id"
         )).fetchall()
     assert [(r[0], r[1]) for r in rows] == [("PED-1", "processed")]
 
@@ -154,7 +99,7 @@ def test_payload_invalido_tambem_fica_guardado(ctx):
     r = client.post(ctx["url"], json={"status": "approved"})
     assert r.status_code == 422
     with engine.connect() as conn:
-        status = conn.execute(text("SELECT status FROM webhook_events")).scalar_one()
+        status = conn.execute(text("SELECT status FROM conta_1.webhook_events")).scalar_one()
     assert status == "rejected"
 
 
@@ -194,7 +139,7 @@ def test_falha_interna_guarda_evento_e_reprocessa(ctx, monkeypatch):
     monkeypatch.setattr(receive, "process_webhook_event", quebra)
     r = client.post(ctx["url"], json=_venda())
     assert r.status_code == 500
-    with SessionLocal() as db:
+    with sessao() as db:
         assert db.query(Transaction).count() == 0
 
     r = client.get("/api/webhook-events?status=failed", headers=ctx["auth"])
@@ -216,7 +161,8 @@ def test_eventos_exigem_login(ctx):
 
 # ── Permissões: "viewer" (visualizador) é somente leitura ──────────────────
 
-_ROTAS_PUBLICAS = {"/api/login", "/api/setup", "/api/setup/invite/{token}", "/api/webhook/{platform}/{slug}"}
+_ROTAS_PUBLICAS = {"/api/login", "/api/setup", "/api/setup/status", "/api/setup/invite/{token}",
+                   "/api/webhook/{platform}/{slug}"}
 _VIEWER_PODE = {("PUT", "/api/profile"), ("PUT", "/api/profile/password"),
                 ("POST", "/api/gemini/chat"), ("POST", "/api/gemini/daily-report")}
 

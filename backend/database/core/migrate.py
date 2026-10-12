@@ -77,12 +77,15 @@ def run_enum_migrations(engine: Engine) -> None:
         for type_name, value in _NEW_ENUM_VALUES:
             try:
                 exists = conn.execute(
-                    text("SELECT 1 FROM pg_type WHERE typname = :n"),
+                    text(
+                        "SELECT 1 FROM pg_type t JOIN pg_namespace n ON n.oid = t.typnamespace "
+                        "WHERE t.typname = :n AND n.nspname = 'public'"
+                    ),
                     {"n": type_name},
                 ).fetchone()
                 if exists:
                     conn.execute(text(
-                        f"ALTER TYPE {type_name} "
+                        f"ALTER TYPE public.{type_name} "
                         f"ADD VALUE IF NOT EXISTS '{value}'"
                     ))
                     logger.info(f"✅ '{value}' em {type_name}")
@@ -95,7 +98,7 @@ def run_enum_migrations(engine: Engine) -> None:
             try:
                 row = conn.execute(text(
                     "SELECT data_type FROM information_schema.columns "
-                    "WHERE table_name = :t AND column_name = :c"
+                    "WHERE table_schema = 'public' AND table_name = :t AND column_name = :c"
                 ), {"t": table, "c": column}).fetchone()
 
                 if row is None or row[0] != "character varying":

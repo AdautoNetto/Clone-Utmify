@@ -27,8 +27,8 @@ export function ResetPasswordModal({ user, onClose, onReset }: ResetPasswordModa
       setError("As senhas não coincidem");
       return;
     }
-    if (password.length < 6) {
-      setError("Mínimo 6 caracteres");
+    if (password.length < 8) {
+      setError("Mínimo 8 caracteres");
       return;
     }
     setError("");
@@ -67,11 +67,11 @@ export function ResetPasswordModal({ user, onClose, onReset }: ResetPasswordModa
               <Input
                 id="reset-password"
                 type={show ? "text" : "password"}
-                placeholder="Mínimo 6 caracteres"
+                placeholder="Mínimo 8 caracteres"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
               />
               <button
                 type="button"
@@ -91,7 +91,7 @@ export function ResetPasswordModal({ user, onClose, onReset }: ResetPasswordModa
               value={confirm}
               onChange={(e) => setConfirm(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
             />
           </div>
           {error && <p className="text-sm text-destructive text-center">{error}</p>}

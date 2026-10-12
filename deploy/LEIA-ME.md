@@ -12,6 +12,21 @@ Tudo aqui foi pensado para **nunca perder venda nem métrica**:
 - **Cada venda recebida é gravada “crua” antes de ser processada.** Se algo falhar, ela fica guardada e dá para reprocessar (ver “Se uma venda falhar” no fim).
 - **Saúde:** `https://SEU-DOMINIO/api/health` responde `{"status":"ok","database":"ok"}` quando está tudo no ar.
 
+## Várias contas (cada pessoa com a sua)
+
+- Qualquer pessoa abre o endereço, clica em **Criar conta** e se cadastra com nome, e-mail e senha
+  (mínimo 8 caracteres). Um e-mail = uma conta.
+- **Os dados de cada conta ficam separados dentro do banco** (um compartimento por conta: vendas,
+  clientes, produtos, chaves do Facebook/Gemini, endereços de venda). Uma conta não vê nem altera a outra.
+- O dono de uma conta pode convidar pessoas (menu **Usuários**): elas entram **na conta dele**, como
+  administrador ou só visualização.
+- Proteções do cadastro aberto: no máximo 20 contas novas por hora vindas da mesma conexão (`SIGNUP_MAX_PER_HOUR`), 10 senhas
+  erradas travam aquele e-mail por 15 minutos, e há um teto de contas (`MAX_ACCOUNTS`, padrão 300).
+- Para **fechar o cadastro** (ninguém novo entra; quem já tem conta continua usando): coloque
+  `SIGNUP_ENABLED=0` no `.env` do servidor e rode `sudo sh deploy/atualizar.sh`.
+- Quem já usava a versão de conta única: na primeira subida da versão nova, tudo o que existia vira a
+  **conta nº 1** (do dono antigo), sem perder nada. Todos precisam fazer login de novo uma vez.
+
 > Regra de ouro: **nunca** apague o volume `logpose_pgdata`. No Coolify, ao excluir um recurso, deixe **desmarcada** a opção de apagar volumes. No Docker puro, nunca use `docker compose down -v`.
 
 ---
@@ -36,7 +51,7 @@ Tudo aqui foi pensado para **nunca perder venda nem métrica**:
    ~2 min.
 8. Na aba **General**, em **Domains for app**, escreva `https://logpose.seudominio.com.br:8000` (o `:8000` diz ao Coolify a porta do app; o endereço público fica sem porta). ~1 min.
 9. Clique em **Deploy**. A primeira montagem leva ~5–8 min.
-10. Abra `https://logpose.seudominio.com.br/api/health` → tem que aparecer `"database":"ok"`. Depois abra `https://logpose.seudominio.com.br` e crie o usuário dono. ~2 min.
+10. Abra `https://logpose.seudominio.com.br/api/health` → tem que aparecer `"database":"ok"`. Depois abra `https://logpose.seudominio.com.br` e clique em **Criar conta**. ~2 min.
 
 **Atualizar:** dê `git push` no repositório. O Coolify monta a versão nova e troca o app; o banco e os backups ficam.
 
@@ -74,13 +89,27 @@ do servidor e rode `sudo sh deploy/atualizar.sh`.
 
 **Atualizar depois:** `git push` e, no seu computador, `SERVIDOR=ubuntu@IP sh deploy/publicar-oracle.sh`.
 
+## Vercel na frente (link bonito para o painel)
+
+A Vercel não roda este sistema sozinha (ele precisa de servidor ligado 24h e de banco). O que dá para
+fazer é publicar **só o painel** na Vercel e deixar que ela repasse tudo de `/api` para o servidor:
+
+1. No computador, na pasta `frontend`: `VITE_WEBHOOK_ORIGIN=https://ENDERECO-DO-SERVIDOR npx vite build --outDir <pasta>`
+   (com essa variável, o endereço de vendas mostrado em **Plataformas** aponta direto para o servidor:
+   a venda não passa pela Vercel).
+2. Na pasta gerada, um `vercel.json` com dois repasses: `/api/:path*` → `https://ENDERECO-DO-SERVIDOR/api/:path*`
+   e o resto → `/index.html`.
+3. `vercel deploy --prod` nessa pasta. A cada mudança no painel, repetir os passos 1 e 3.
+
+Os dados continuam no servidor; se o endereço do servidor mudar, refaça os passos 1 a 3.
+
 ## Backups
 
 - Ver os backups: `ls -lh /opt/logpose/backups`
 - Data do último bom: `cat /opt/logpose/backups/ULTIMO-BACKUP-OK`
 - Fazer um agora (Docker puro): `docker compose -f docker-compose.vps.yml exec backup backup.sh once`
   (Coolify: aba do recurso → container **backup** → **Execute Command** → `backup.sh once`)
-- Restaurar (Docker puro): `sh deploy/backup/restaurar.sh /opt/logpose/backups/<arquivo>.dump` — pede confirmação e faz um backup do estado atual antes.
+- Restaurar (Docker puro): `sh deploy/backup/restaurar.sh /opt/logpose/backups/<arquivo>.dump` — pede confirmação e faz um backup do estado atual antes. Restaura **todas as contas** como estavam naquele backup (contas criadas depois dele deixam de existir; estão no backup de segurança feito na hora).
 - **Recomendado:** copiar os backups para fora da VPS de vez em quando (se a VPS inteira sumir, os backups somem junto). Do seu computador: `scp root@IP-DA-VPS:/opt/logpose/backups/*.dump .`
 
 ## Se uma venda falhar
@@ -97,3 +126,5 @@ As plataformas (Kiwify, PayT) reenviam sozinhas quando recebem erro. Para ver e 
 | `BACKUP_HOUR` | `03` | hora do backup diário (00–23, Brasília) |
 | `BACKUP_KEEP_DAYS` | `14` | quantos dias de backup guardar |
 | `BACKUP_DIR` | `/opt/logpose/backups` | pasta dos backups no servidor |
+| `SIGNUP_ENABLED` | `1` | `0` fecha o cadastro de contas novas |
+| `MAX_ACCOUNTS` | `300` | número máximo de contas no sistema |

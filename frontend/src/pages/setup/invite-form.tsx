@@ -64,11 +64,11 @@ export function InviteSetupForm({ name, role, onSubmit, error, loading }: Invite
             <Input
               id="invite-password"
               type={showPassword ? "text" : "password"}
-              placeholder="Mínimo 6 caracteres"
+              placeholder="Mínimo 8 caracteres"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
               className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
             />
             <button
@@ -91,7 +91,7 @@ export function InviteSetupForm({ name, role, onSubmit, error, loading }: Invite
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={8}
               className="h-11 rounded-[11px] bg-muted border-border text-foreground placeholder:text-muted-foreground/70 focus-visible:border-ring"
             />
             <button

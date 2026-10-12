@@ -50,6 +50,6 @@ done
 
 docker compose $ARQS ps
 echo
-echo "OK. Abra https://$DOMINIO e crie o usuário dono."
+echo "OK. Abra https://$DOMINIO e clique em 'Criar conta' (cada pessoa cria a sua)."
 echo "Backups diários em /opt/logpose/backups (o primeiro já foi feito agora)."
 echo "NUNCA rode 'docker compose down -v' (o -v apaga o banco)."

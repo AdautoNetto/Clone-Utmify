@@ -67,7 +67,7 @@ export async function apiRequest<T>(
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
   if (!response.ok) {
-    if (response.status === 401) {
+    if (response.status === 401 && endpoint !== "/login") {
       removeCookie("access_token");
       localStorage.removeItem("user");
 

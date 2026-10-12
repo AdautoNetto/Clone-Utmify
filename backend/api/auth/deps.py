@@ -66,6 +66,15 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # O login só vale para a conta em que foi emitido (é o "acc" do token que
+    # aponta o banco para os dados daquela conta — ver TenantMiddleware).
+    if admin.account_id is None or payload.get("acc") != admin.account_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Sessão expirada. Faça login de novo.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     _block_viewer_writes(request, admin)
     return admin
 

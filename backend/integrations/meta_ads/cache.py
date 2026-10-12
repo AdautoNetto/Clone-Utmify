@@ -5,6 +5,8 @@ Evita chamadas duplicadas à API durante um período curto.
 import time
 from typing import Any
 
+from database.core.tenancy import current_schema
+
 # TTL padrão: 5 minutos
 DEFAULT_TTL_SECONDS = 300
 
@@ -41,6 +43,9 @@ def build_cache_key(
     parts = [account_id, endpoint, date_start, date_end]
     if extra:
         parts.append(extra)
+    # Cada conta do sistema tem o seu cache: uma conta nunca recebe o resultado
+    # buscado com o token de outra, mesmo que as duas usem a mesma conta de anúncio.
+    parts.append(f"conta={current_schema() or '-'}")
     return "|".join(parts)
 
 

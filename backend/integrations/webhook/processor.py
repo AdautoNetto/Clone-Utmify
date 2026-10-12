@@ -8,6 +8,7 @@ from database.models.customer import Customer
 from database.models.transaction import Transaction, TransactionStatus
 from database.models.customer_product import CustomerProduct
 from database.core.timezone import now_sp
+from database.core.tenancy import current_account_id
 from integrations.webhook.recovery_helper import (
     create_recovery_if_pending,
     mark_recovery_as_recovered,
@@ -71,7 +72,11 @@ def process_webhook_event(db: Session, event: StandardizedWebhookEvent):
     # Um webhook por vez (trava liberada no commit/rollback). Sem isso, vendas
     # simultâneas do mesmo cliente perdem soma em total_spent/total_orders, e o
     # mesmo produto novo pode ser criado duas vezes. Cada evento leva milissegundos.
-    db.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": _WEBHOOK_LOCK_KEY})
+    # A trava é por conta: a fila de uma conta não segura as vendas das outras.
+    db.execute(
+        text("SELECT pg_advisory_xact_lock(:k, :conta)"),
+        {"k": _WEBHOOK_LOCK_KEY, "conta": current_account_id() or 0},
+    )
 
     # -------------------------------------------------------------
     # 1. PROCESSAMENTO DO CUSTOMER

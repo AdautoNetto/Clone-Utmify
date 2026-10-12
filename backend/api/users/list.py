@@ -12,8 +12,13 @@ def list_users(
     current_user: Admin = Depends(require_role(UserRole.owner, UserRole.admin)),
     db: Session = Depends(get_db),
 ):
-    """List all users. Owners and admins can see everyone."""
-    users = db.query(Admin).order_by(Admin.id).all()
+    """Lista os usuários DA CONTA de quem pede (dono e convidados)."""
+    users = (
+        db.query(Admin)
+        .filter(Admin.account_id == current_user.account_id)
+        .order_by(Admin.id)
+        .all()
+    )
     result = []
     for u in users:
         result.append({

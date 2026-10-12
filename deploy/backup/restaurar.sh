@@ -30,6 +30,10 @@ echo "2/4 Parando o app (para não chegar venda no meio da restauração)..."
 $COMPOSE stop app
 
 echo "3/4 Restaurando..."
+# Contas criadas DEPOIS do backup não estão no arquivo. Os compartimentos delas
+# saem antes, para o banco ficar igual ao do backup (o backup de segurança do
+# passo 1 guarda tudo, se precisar voltar). Os que estão no arquivo são recriados.
+$COMPOSE exec -T db psql -U logpose -d logpose -v ON_ERROR_STOP=1 -q -c "DO \$\$ DECLARE s text; BEGIN FOR s IN SELECT nspname FROM pg_namespace WHERE nspname LIKE 'conta\_%' OR nspname LIKE 'legado%' LOOP EXECUTE format('DROP SCHEMA %I CASCADE', s); END LOOP; END \$\$;"
 $COMPOSE exec -T db sh -c 'pg_restore --clean --if-exists --no-owner -U logpose -d logpose' < "$ARQ"
 
 echo "4/4 Ligando o app..."

@@ -25,6 +25,10 @@ services:
       DATABASE_URL: postgresql://logpose:${DB_PASSWORD:?defina DB_PASSWORD}@db:5432/logpose
       SECRET_KEY: ${SECRET_KEY:?defina SECRET_KEY}
       META_GRAPH_API_VERSION: ${META_GRAPH_API_VERSION:-v25.0}
+      # Multi-conta: cadastro aberto (0 fecha) e teto de contas (servidor pequeno)
+      SIGNUP_ENABLED: ${SIGNUP_ENABLED:-1}
+      MAX_ACCOUNTS: ${MAX_ACCOUNTS:-300}
+      SIGNUP_MAX_PER_HOUR: ${SIGNUP_MAX_PER_HOUR:-20}
     depends_on:
       db:
         condition: service_healthy

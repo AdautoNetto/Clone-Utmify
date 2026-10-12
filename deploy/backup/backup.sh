@@ -6,7 +6,7 @@
 #                    às BACKUP_HOUR horas (horário de Brasília).
 #   backup.sh once   faz um backup agora e sai (usado por "backup manual").
 #
-# Arquivos: /backups/logpose-AAAA-MM-DD_HHMM.dump (formato do pg_restore,
+# Arquivos: /backups/logpose-AAAA-MM-DD_HHMMSS.dump (formato do pg_restore,
 # já comprimido). Guarda BACKUP_KEEP_DAYS dias. Só apaga antigos DEPOIS de um
 # backup novo dar certo, então nunca fica sem nenhum.
 set -u
@@ -21,7 +21,13 @@ log() { echo "[backup $(date '+%Y-%m-%d %H:%M:%S')] $*"; }
 
 run_backup() {
   mkdir -p "$BACKUP_DIR"
-  name="logpose-$(date +%Y-%m-%d_%H%M).dump"
+  # Segundos no nome + checagem: dois backups seguidos (ex.: o de segurança que o
+  # restaurar.sh faz) nunca gravam por cima um do outro.
+  name="logpose-$(date +%Y-%m-%d_%H%M%S).dump"
+  while [ -e "$BACKUP_DIR/$name" ]; do
+    sleep 1
+    name="logpose-$(date +%Y-%m-%d_%H%M%S).dump"
+  done
   tmp="$BACKUP_DIR/.$name.parcial"
 
   log "iniciando $name"

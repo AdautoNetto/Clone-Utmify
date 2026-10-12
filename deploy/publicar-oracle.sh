@@ -12,7 +12,8 @@ set -eu
 : "${SERVIDOR:?defina SERVIDOR=usuario@ip (ex.: ubuntu@1.2.3.4)}"
 CHAVE="${CHAVE:-$HOME/.ssh/oracle_valetec}"
 PASTA="${PASTA:-/opt/logpose/app}"
-SSH="ssh -i $CHAVE -o BatchMode=yes"
+# Função (e não variável) para o caminho da chave poder ter espaço (ex.: "C:/Users/Nome Sobrenome")
+remoto() { ssh -i "$CHAVE" -o BatchMode=yes -o ServerAliveInterval=30 "$SERVIDOR" "$@"; }
 
 echo "== 1/3 Montando o painel"
 (cd frontend && npm run build >/dev/null)
@@ -23,7 +24,7 @@ TMP=$(mktemp -d)
 tar --force-local -czf "$TMP/painel.tgz" -C frontend/dist .
 scp -q -i "$CHAVE" -o BatchMode=yes "$TMP/painel.tgz" "$SERVIDOR:/tmp/painel.tgz"
 rm -rf "$TMP"
-$SSH "$SERVIDOR" "set -e; cd $PASTA; rm -rf frontend_dist.novo; mkdir frontend_dist.novo; tar xzf /tmp/painel.tgz -C frontend_dist.novo; rm -rf frontend_dist; mv frontend_dist.novo frontend_dist; rm -f /tmp/painel.tgz"
+remoto "set -e; cd $PASTA; rm -rf frontend_dist.novo; mkdir frontend_dist.novo; tar xzf /tmp/painel.tgz -C frontend_dist.novo; rm -rf frontend_dist; mv frontend_dist.novo frontend_dist; rm -f /tmp/painel.tgz"
 
 echo "== 3/3 Atualizando o servidor (backup, git pull, troca dos containers)"
-$SSH "$SERVIDOR" "cd $PASTA && sudo sh deploy/atualizar.sh"
+remoto "cd $PASTA && sudo sh deploy/atualizar.sh"

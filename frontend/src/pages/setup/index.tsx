@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
-import { createAdmin } from "@/services/auth";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { createAdmin, loginUser } from "@/services/auth";
 import { getInviteInfo, completeInvite } from "@/services/users";
 import { SetupForm } from "./form";
 import { InviteSetupForm } from "./invite-form";
@@ -55,7 +55,13 @@ export default function SetupPage() {
         name: data.name, email: data.email,
         password: data.password, confirm_password: data.confirmPassword,
       });
-      navigate("/login", { replace: true });
+      // Conta criada: já entra direto (se o login falhar, cai na tela de entrar)
+      try {
+        await loginUser({ email: data.email, password: data.password });
+        navigate("/dashboard", { replace: true });
+      } catch {
+        navigate("/login", { replace: true });
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Erro ao criar conta");
     } finally {
@@ -118,14 +124,22 @@ export default function SetupPage() {
 
   return (
     <AuthShell
-      title={inviteToken ? "Criar sua conta" : "Configuração inicial"}
+      title={inviteToken ? "Criar sua conta" : "Criar conta"}
       subtitle={
         inviteToken
           ? "Configure sua conta para acessar o painel"
-          : "Crie a conta do dono para começar"
+          : "Cadastre-se com e-mail e senha. Seus dados ficam só na sua conta."
       }
     >
       {renderContent()}
+      {!inviteToken && (
+        <p className="mt-5 text-center text-sm text-muted-foreground">
+          Já tem conta?{" "}
+          <Link to="/login" className="font-bold text-primary hover:underline">
+            Entrar
+          </Link>
+        </p>
+      )}
     </AuthShell>
   );
 }

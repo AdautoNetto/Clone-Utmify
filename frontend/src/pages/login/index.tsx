@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "@/services/auth";
 import { LoginForm } from "./form";
 import { AuthShell } from "@/components/brand/AuthShell";
@@ -26,6 +26,12 @@ export default function LoginPage() {
   return (
     <AuthShell title="Entrar" subtitle="Acesse o painel de vendas">
       <LoginForm onSubmit={handleSubmit} error={error} loading={loading} />
+      <p className="mt-5 text-center text-sm text-muted-foreground">
+        Ainda não tem conta?{" "}
+        <Link to="/setup" className="font-bold text-primary hover:underline">
+          Criar conta
+        </Link>
+      </p>
     </AuthShell>
   );
 }

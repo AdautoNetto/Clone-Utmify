@@ -1,12 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 from pydantic import BaseModel, EmailStr
 import bcrypt
 from database.core.connection import get_db
 from database.models.admin import Admin
 from api.auth.token import create_access_token
+from api.auth.ratelimit import SlidingWindow, client_ip
 
 router = APIRouter()
+
+# 10 senhas erradas em 15 min para o mesmo e-mail a partir da mesma conexão → espera
+login_failures = SlidingWindow(10, 15 * 60)
 
 
 class LoginRequest(BaseModel):
@@ -21,20 +26,31 @@ class LoginResponse(BaseModel):
 
 
 @router.post("/login", response_model=LoginResponse)
-def login(data: LoginRequest, db: Session = Depends(get_db)):
-    admin = db.query(Admin).filter(Admin.email == data.email).first()
+def login(data: LoginRequest, request: Request, db: Session = Depends(get_db)):
+    email = data.email.strip().lower()
+    key = f"{client_ip(request)}|{email}"
+    if login_failures.blocked(key):
+        raise HTTPException(
+            status_code=429,
+            detail="Muitas tentativas. Espere 15 minutos e tente de novo.",
+        )
 
-    if not admin or not admin.password_hash:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    admin = db.query(Admin).filter(func.lower(Admin.email) == email).first()
 
-    try:
-        if not bcrypt.checkpw(data.password.encode("utf-8"), admin.password_hash.encode("utf-8")):
-            raise HTTPException(status_code=401, detail="Invalid credentials")
-    except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+    ok = False
+    if admin and admin.password_hash and admin.account_id is not None:
+        try:
+            ok = bcrypt.checkpw(data.password.encode("utf-8"), admin.password_hash.encode("utf-8"))
+        except ValueError:
+            ok = False
+    if not ok:
+        login_failures.add(key)
+        raise HTTPException(status_code=401, detail="E-mail ou senha incorretos")
 
+    login_failures.clear(key)
     token = create_access_token({
         "sub": str(admin.id),
+        "acc": admin.account_id,  # conta: define quais dados o login enxerga
         "email": admin.email,
         "role": admin.role.value,
     })

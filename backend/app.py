@@ -12,8 +12,7 @@ mimetypes.add_type("application/javascript", ".js")
 mimetypes.add_type("application/json", ".json")
 mimetypes.add_type("image/png", ".png")
 mimetypes.add_type("image/webp", ".webp")
-from database.core.connection import engine, Base
-from database.core.migrate import run_enum_migrations
+from database.core.connection import engine
 from api.auth.setup import router as setup_router
 from api.auth.login import router as login_router
 from api.auth.profile import router as profile_router
@@ -69,21 +68,17 @@ from api.subscriptions.metrics import router as subscriptions_metrics_router
 from api.advanced_settings.features import router as advanced_settings_router
 from api.advanced_settings.reset_sales import router as reset_sales_router
 
-from database.core.migrate_sql import run_sql_migrations
+from database.core.bootstrap import bootstrap_database
 from database.core.connection import wait_for_database
+from database.core.tenancy import set_current_account, reset_current_account
+from api.auth.token import verify_token
 
 # O container do app pode subir antes do Postgres aceitar conexões
 wait_for_database()
 
-# Migrate ENUM columns → VARCHAR (idempotent, runs on every boot)
-run_enum_migrations(engine)
-
-# Create tables (must run before SQL migrations so tables exist)
-Base.metadata.create_all(bind=engine)
-
-# Run SQL migrations from database/migrations/
-# (ALTER TABLE / ADD COLUMN statements that depend on existing tables)
-run_sql_migrations()
+# Tabelas globais (contas, usuários) + as tabelas de cada conta, cada uma no seu
+# compartimento. Instalação antiga de conta única é convertida aqui, sem perder dado.
+bootstrap_database()
 
 app = FastAPI(title="ConvergeAI API")
 
@@ -98,6 +93,39 @@ def health():
         return JSONResponse(status_code=503, content={"status": "error", "database": "down"})
     return {"status": "ok", "database": "ok"}
 
+
+class TenantMiddleware:
+    """
+    Lê o login (token) da requisição e define de qual conta ela é. A partir daí
+    o banco só enxerga os dados dessa conta (ver database/core/connection.py).
+    Sem login válido, nenhuma conta é definida e nenhum dado de negócio é visível.
+    """
+
+    def __init__(self, app):
+        self.app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
+        account_id = None
+        for name, value in scope.get("headers", []):
+            if name == b"authorization":
+                parts = value.decode("latin-1").split(" ", 1)
+                if len(parts) == 2 and parts[0].lower() == "bearer":
+                    payload = verify_token(parts[1].strip())
+                    acc = payload.get("acc") if payload else None
+                    if isinstance(acc, int) and not isinstance(acc, bool):
+                        account_id = acc
+                break
+        token = set_current_account(account_id)
+        try:
+            await self.app(scope, receive, send)
+        finally:
+            reset_current_account(token)
+
+
+app.add_middleware(TenantMiddleware)
 
 # CORS for development
 app.add_middleware(
