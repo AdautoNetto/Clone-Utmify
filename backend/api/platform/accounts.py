@@ -18,7 +18,7 @@ from database.core.connection import get_db
 from database.core.tenancy import schema_for
 from database.models.account import Account, WebhookRoute
 from database.models.admin import Admin, UserRole
-from integrations.email.smtp import send_email
+from integrations.email.smtp import describe_error, send_email
 
 logger = logging.getLogger(__name__)
 
@@ -214,5 +214,5 @@ def test_email_settings(
             "Este é um e-mail de teste do painel. Se chegou, o envio está funcionando.\n",
         )
     except Exception as e:
-        raise HTTPException(status_code=400, detail=f"O servidor de e-mail recusou: {type(e).__name__}: {e}"[:300])
+        raise HTTPException(status_code=400, detail=describe_error(e))
     return {"message": f"E-mail de teste enviado para {current_user.email}"}
